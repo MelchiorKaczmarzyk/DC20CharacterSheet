@@ -1,0 +1,617 @@
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<mat-sidenav-container>
+<mat-sidenav #sidenav position="end" appSwipe (swipeRight)="closeSidenav(sidenav)" class="purple-sidenav">
+          <mat-nav-list>
+          @for (s of sections; track s) {
+            <div *ngIf="!((s.display=='Maneuvers' && !isClassMartial)||(s.display=='Spells' && !isClassCaster))">
+            <a mat-list-item (click)="navigateToSection(s.name)">
+              {{s.display}}
+            </a>
+            <hr>
+            </div>
+          }
+        </mat-nav-list>
+</mat-sidenav>
+
+<mat-sidenav-content
+  appSwipe
+  (swipeLeft)="openSidenav(sidenav)">
+<!-- ATRIBUTES -->
+<div class="page" id="attributesSection">
+<h2 class="section-header purple">Atributes</h2>
+<hr class="purple-border">
+<br>
+<div class="form-container">
+  <form class="points-form">
+      <mat-form-field *ngFor="let attribute of model.attributes; let i = index" 
+      appearance="outline" class="points-field">
+      <mat-label>{{attribute.name}}</mat-label>
+      <input name="{{attribute.name}}" class="atribute-score" style="font-size: 45px;" 
+      [(ngModel)]="attribute.value"
+        matInput
+        type="number"
+        [min]="-2"
+        [max]="3"
+        [readonly]="true" />
+
+      <button mat-icon-button matSuffix aria-label="Increase value"
+        (click)="increaseAttribute(attribute)">
+        <mat-icon>keyboard_arrow_up</mat-icon>
+      </button>
+      <button mat-icon-button matSuffix aria-label="Decrease value"
+        (click)="decreaseAttribute(attribute)">
+        <mat-icon>keyboard_arrow_down</mat-icon>
+      </button>
+    </mat-form-field>
+    <!-- Remaining points display -->
+    <mat-form-field appearance="outline" class="remaining-field" 
+    [ngClass]="{'error-look': !areAttributePointsSpent}">
+      <mat-label [ngClass]="{'error-text' : !areAttributePointsSpent}">Atribute Points</mat-label>
+      <input matInput type="number" [readonly]="true" [(ngModel)]="model.attributePoints" 
+        name="remainingPoints" class="section-header"/>
+    </mat-form-field>
+  </form>
+</div>
+</div>
+<br>
+<!-- SKILLS -->
+<div class="page" id="skillsSection">
+<hr class="purple-border">
+<h2 class="section-header purple">Skills</h2>
+<hr class="purple-border">
+<div class="page-container">
+ <!-- Top input row -->
+  <div class="top-inputs">
+    <div class="form-container">
+    <form class="points-form">
+    <mat-form-field appearance="outline" class="top-field" [ngClass]="{'error-look':!areSkillPointsSpent}">
+      <mat-label [ngClass]="{'error-text':!areSkillPointsSpent}" >Skill points</mat-label>
+      <input matInput name="skillPoints" class="top-input-field" type="number" 
+      style="font-size: 35px;" [readonly]="true" [(ngModel)]="model.skillPoints"/>
+    </mat-form-field>
+    </form>
+    </div>
+  </div>
+  <!-- Prime -->
+ <!-- Prime -->
+<div class="group">
+  <h2 class="group-header">Prime</h2>
+  <div class="row">
+    <span class="row-label">Awarness</span>
+    <mat-radio-group [value]="getSkill('Awarness').level" class="skills-radio-group">
+      <mat-radio-button color="primary" [value]="1"
+        (click)="onNoviceClicked('Awarness', $event)">+2
+      </mat-radio-button>
+      <mat-radio-button [value]="2"
+        (click)="onAdeptClicked('Awarness', $event)">+4
+      </mat-radio-button>
+    </mat-radio-group>
+  </div>
+</div>
+
+<!-- Might -->
+<div class="group">
+  <h2 class="group-header">Might</h2>
+  <div class="row">
+    <span class="row-label">Athletics</span>
+    <mat-radio-group [value]="getSkill('Athletics').level" class="skills-radio-group">
+      <mat-radio-button color="primary" [value]="1"
+        (click)="onNoviceClicked('Athletics', $event)">+2
+      </mat-radio-button>
+      <mat-radio-button [value]="2"
+        (click)="onAdeptClicked('Athletics', $event)">+4
+      </mat-radio-button>
+    </mat-radio-group>
+  </div>
+
+  <div class="row">
+    <span class="row-label">Intimidation</span>
+    <mat-radio-group [value]="getSkill('Intimidation').level" class="skills-radio-group">
+      <mat-radio-button color="primary" [value]="1"
+        (click)="onNoviceClicked('Intimidation', $event)">+2
+      </mat-radio-button>
+      <mat-radio-button [value]="2"
+        (click)="onAdeptClicked('Intimidation', $event)">+4
+      </mat-radio-button>
+    </mat-radio-group>
+  </div>
+</div>
+
+<!-- Agility -->
+<div class="group">
+  <h2 class="group-header">Agility</h2>
+  <div class="row">
+    <span class="row-label">Acrobatics</span>
+    <mat-radio-group [value]="getSkill('Acrobatics').level" class="skills-radio-group">
+      <mat-radio-button color="primary" [value]="1"
+        (click)="onNoviceClicked('Acrobatics', $event)">+2
+      </mat-radio-button>
+      <mat-radio-button [value]="2"
+        (click)="onAdeptClicked('Acrobatics', $event)">+4
+      </mat-radio-button>
+    </mat-radio-group>
+  </div>
+
+  <div class="row">
+    <span class="row-label">Trickery</span>
+    <mat-radio-group [value]="getSkill('Trickery').level" class="skills-radio-group">
+      <mat-radio-button color="primary" [value]="1"
+        (click)="onNoviceClicked('Trickery', $event)">+2
+      </mat-radio-button>
+      <mat-radio-button [value]="2"
+        (click)="onAdeptClicked('Trickery', $event)">+4
+      </mat-radio-button>
+    </mat-radio-group>
+  </div>
+
+  <div class="row">
+    <span class="row-label">Stealth</span>
+    <mat-radio-group [value]="getSkill('Stealth').level" class="skills-radio-group">
+      <mat-radio-button color="primary" [value]="1"
+        (click)="onNoviceClicked('Stealth', $event)">+2
+      </mat-radio-button>
+      <mat-radio-button [value]="2"
+        (click)="onAdeptClicked('Stealth', $event)">+4
+      </mat-radio-button>
+    </mat-radio-group>
+  </div>
+</div>
+
+<!-- Charisma -->
+<div class="group">
+  <h2 class="group-header">Charisma</h2>
+  <div class="row">
+    <span class="row-label">Animal</span>
+    <mat-radio-group [value]="getSkill('Animal').level" class="skills-radio-group">
+      <mat-radio-button color="primary" [value]="1"
+        (click)="onNoviceClicked('Animal', $event)">+2
+      </mat-radio-button>
+      <mat-radio-button [value]="2"
+        (click)="onAdeptClicked('Animal', $event)">+4
+      </mat-radio-button>
+    </mat-radio-group>
+  </div>
+
+  <div class="row">
+    <span class="row-label">Influence</span>
+    <mat-radio-group [value]="getSkill('Influence').level" class="skills-radio-group">
+      <mat-radio-button color="primary" [value]="1"
+        (click)="onNoviceClicked('Influence', $event)">+2
+      </mat-radio-button>
+      <mat-radio-button [value]="2"
+        (click)="onAdeptClicked('Influence', $event)">+4
+      </mat-radio-button>
+    </mat-radio-group>
+  </div>
+
+  <div class="row">
+    <span class="row-label">Insight</span>
+    <mat-radio-group [value]="getSkill('Insight').level" class="skills-radio-group">
+      <mat-radio-button color="primary" [value]="1"
+        (click)="onNoviceClicked('Insight', $event)">+2
+      </mat-radio-button>
+      <mat-radio-button [value]="2"
+        (click)="onAdeptClicked('Insight', $event)">+4
+      </mat-radio-button>
+    </mat-radio-group>
+  </div>
+</div>
+
+<!-- Intelligence -->
+<div class="group">
+  <h2 class="group-header">Intelligence</h2>
+  <div class="row">
+    <span class="row-label">Investigation</span>
+    <mat-radio-group [value]="getSkill('Investigation').level" class="skills-radio-group">
+      <mat-radio-button color="primary" [value]="1"
+        (click)="onNoviceClicked('Investigation', $event)">+2
+      </mat-radio-button>
+      <mat-radio-button [value]="2"
+        (click)="onAdeptClicked('Investigation', $event)">+4
+      </mat-radio-button>
+    </mat-radio-group>
+  </div>
+
+  <div class="row">
+    <span class="row-label">Medicine</span>
+    <mat-radio-group [value]="getSkill('Medicine').level" class="skills-radio-group">
+      <mat-radio-button color="primary" [value]="1"
+        (click)="onNoviceClicked('Medicine', $event)">+2
+      </mat-radio-button>
+      <mat-radio-button [value]="2"
+        (click)="onAdeptClicked('Medicine', $event)">+4
+      </mat-radio-button>
+    </mat-radio-group>
+  </div>
+
+  <div class="row">
+    <span class="row-label">Survival</span>
+    <mat-radio-group [value]="getSkill('Survival').level" class="skills-radio-group">
+      <mat-radio-button color="primary" [value]="1"
+        (click)="onNoviceClicked('Survival', $event)">+2
+      </mat-radio-button>
+      <mat-radio-button [value]="2"
+        (click)="onAdeptClicked('Survival', $event)">+4
+      </mat-radio-button>
+    </mat-radio-group>
+  </div>
+</div>
+
+</div>
+</div>
+<div class="page" id="tradesSection">
+<hr class="purple-border">
+<h2 class="section-header purple">Trades</h2>
+<hr class="purple-border">
+<br>
+<div class="form-container">
+  <form class="points-form">
+    <!-- Remaining trade points display -->
+      <mat-form-field appearance="outline" class="remaining-field"
+      [ngClass]="{'error-look':!areTradePointsSpent}">
+      <mat-label [ngClass]="{'error-text':!areTradePointsSpent}">Trade Points</mat-label>
+      <input matInput type="number" [readonly]="true" 
+        name="remainingTradePoints" class="section-header" [(ngModel)]="model.tradePoints"/>
+    </mat-form-field>
+    </form>
+  </div>
+</div>
+<div class="page-container">
+  <div *ngFor="let trade of model.trades; let i = index" class="row">
+    <mat-form-field appearance="outline" class="wide-field">
+      <mat-label>Trade {{ i + 1 }}</mat-label>
+      <input
+        name="trade{{ i + 1 }}"
+        matInput
+        type="text"
+        maxlength="15"
+        [(ngModel)]="trade.name"
+      />
+    </mat-form-field>
+
+    <mat-radio-group [value]="trade.level">
+    <mat-radio-button
+      color="primary"
+      name="trade{{ i + 1 }}novice"
+      class="trade-button-left"
+      [value]="2"
+      [checked]="trade.level>=1" (click)="onNoviceTradeClicked(trade.name, $event)"
+    >+2
+    </mat-radio-button>
+
+    <mat-radio-button
+      name="trade{{ i + 1 }}adept"
+      class="trade-button"
+      [value]="4"
+      [checked]="trade.level==2" (click)="onAdeptTradeClicked(trade.name, $event)"
+    >+4
+    </mat-radio-button>
+    </mat-radio-group>
+  </div>
+</div>
+
+<div class="page" id="ancestriesSection">
+<hr class="purple-border">
+<h2 class="section-header purple">Ancestries</h2>
+<hr class="purple-border">
+<mat-checkbox color="primary" [(ngModel)]="model.allowLimitlessAncestries"> Limitless Ancestries</mat-checkbox>
+    <div class="form-container">
+  <form class="points-form">
+    <!-- Remaining ancestry points display -->
+    <mat-form-field appearance="outline" class="remaining-field"
+    [ngClass]="{'error-look':!areAncestryPointsSpent}">
+      <mat-label [ngClass]="{'error-text':!areAncestryPointsSpent}">Ancestry Points</mat-label>
+      <input matInput type="number" [readonly]="true" 
+        name="remainingAncestryPoints" class="section-header" [(ngModel)]="model.ancestryPoints"/>
+    </mat-form-field>
+    </form>
+    </div>
+
+<mat-accordion multi>
+  <mat-expansion-panel *ngFor="let ancestry of model.ancestries" #panel>
+    <!-- HEADER (Ancestry name + checkbox) -->
+    <mat-expansion-panel-header>
+      <div [ngClass]="{'error-look':!areAncestriesChosen}">
+      <mat-checkbox [(ngModel)]="ancestry.selected" (click)="onAncestryChosen(ancestry, $event, panel)">
+      </mat-checkbox>
+      </div>
+      <span class="ancestry-name">{{ ancestry.name }}</span>
+    </mat-expansion-panel-header>
+
+    <!-- TRAITS LIST -->
+    <div *ngFor="let trait of ancestry.traits" class="trait-container">  <!-- ① NEW wrapper div -->
+  <div class="trait-row">  <!-- ② The row now only holds checkbox + text -->
+    <mat-checkbox [(ngModel)]="trait.selected" color="primary"
+      (click)="onAncestryTraitChosen(ancestry, trait)">
+    </mat-checkbox>
+
+    <span class="trait-content">
+      <strong>({{ trait.cost }}) </strong>
+      <strong>{{ trait.name }}:</strong>
+      {{ trait.text }}
+    </span>
+  </div>
+
+  <!-- ③ The select section moved OUTSIDE the .trait-row and into its own container -->
+  <div *ngIf="trait.hasOptions && trait.selected"
+       [ngClass]="{'error-look':!model.isAttributeIncreaseCorrect}"
+       class="trait-select-wrapper"> <!-- ④ NEW class for layout -->
+    <mat-form-field appearance="outline" class="selection-field">
+      <mat-label [ngClass]="{'error-text':!model.isAttributeIncreaseCorrect}">
+        {{ trait.name }}
+      </mat-label>
+      <mat-select 
+        (selectionChange)="onTraitOptionChosen(trait, $event.value)"
+        (opened)="onOpenedChange(trait)"
+        >
+        <mat-option *ngFor="let option of trait.options" [value]="option">
+          {{ option }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+</div>
+
+  </mat-expansion-panel>
+</mat-accordion>
+<br>
+<div class="selection-section">
+  
+  <!-- 1. Attributes < 3 -->
+  <div [ngClass]="{'error-look':!model.isAttributeIncreaseCorrect}">
+  <mat-form-field appearance="outline" class="selection-field" *ngIf="pickedAttributeIncrease()">
+    <mat-label [ngClass]="{'error-text':!model.isAttributeIncreaseCorrect}">Attribute increase</mat-label>
+    <mat-select (selectionChange)="onAttributeForIncreaseChosen($event.value)">
+      <mat-option *ngFor="let attribute of model.attributesBelow3" [value]="attribute.name">
+        {{ attribute.name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  </div>
+
+  <!-- 2. Attributes > -2 -->
+   <div [ngClass]="{'error-look':!model.isAttributeDecreaseCorrect}">
+  <mat-form-field appearance="outline" class="selection-field" *ngIf="pickedAttributeDecrease()">
+    <mat-label [ngClass]="{'error-text':!model.isAttributeDecreaseCorrect}">Attribute decrease</mat-label>
+    <mat-select (selectionChange)="onAttributeForDecreaseChosen($event.value)">
+      <mat-option *ngFor="let attribute of model.attributesAboveMinus2" [value]="attribute.name">
+        {{ attribute.name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  </div>
+
+  <!-- 3. Skills with Novice -->
+  <div [ngClass]="{'error-look':!isSkillExpertiseCorrect}">
+  <mat-form-field appearance="outline" class="selection-field" *ngIf="pickedSkillExpertise() && !isSkillAdept()">
+    <mat-label [ngClass]="{'error-text':!isSkillExpertiseCorrect}">Skill expertise</mat-label>
+    <mat-select (selectionChange)="onSkillForExpertiseChosen($event.value)"
+    [ngClass]="{'error-field':!isSkillExpertiseCorrect}">
+      <mat-option *ngFor="let skill of skillsNovice" [value]="skill.name">
+        {{ skill.name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  </div>
+
+  <div [ngClass]="{'error-look':!isTradeExpertiseCorrect}">
+  <mat-form-field appearance="outline" class="selection-field" *ngIf="pickedTradeExpertise() && !isTradeAdept()">
+    <mat-label [ngClass]="{'error-text':!isTradeExpertiseCorrect}">Trade expertise</mat-label>
+    <mat-select (selectionChange)="onTradeForExpertiseChosen($event.value)">
+      <mat-option *ngFor="let trade of tradesNovice" [value]="trade.name">
+        {{ trade.name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  </div>
+
+</div>
+<!--CLASSES-->
+<div class="page" id="classSection">
+<hr class="purple-border">
+<h2 class="section-header purple">Class</h2>
+<hr class="purple-border">
+<mat-accordion>
+  <mat-expansion-panel *ngFor="let classItem of classes" #panel>
+    <!-- 1. Checkbox + Class Name as Header -->
+    <mat-expansion-panel-header>
+      <div [ngClass]="{'error-look':!isClassSelected}">
+      <mat-checkbox [(ngModel)]="classItem.selected" (click)="onClassChosen(classItem, panel)">
+      </mat-checkbox>
+      </div>
+      <span class="class-name">{{ classItem.name }}</span>
+    </mat-expansion-panel-header>
+
+    <!-- 2. Talents -->
+    <div *ngFor="let talent of classItem.talents" class="talent-section">
+        <p>
+          <strong class="talent-name">{{ talent.name }}:</strong> {{ talent.text | prependSpace}}
+        </p>
+      <!-- 3. SubTalents -->
+      <div *ngIf="talent.subTalents != []" class="subtalents">
+        <p *ngFor="let sub of talent.subTalents">
+          <em class="semi-bold">{{ sub.name }}: </em> {{ sub.text | prependSpace}}
+        </p>
+      </div>
+
+      <!-- 4. Options -->
+      <div *ngIf="talent.options != []" class="talent-options">
+        <div [ngClass]="{'error-look':!areClassOptionsSelected}">
+        <mat-checkbox color="primary" *ngFor="let option of talent.options" [(ngModel)]="option.selected" 
+          (click)="onTalentOptionChosen(talent, option)">
+          <strong><em>{{ option.name }}: </em></strong>  {{ option.text | prependSpace}}
+        </mat-checkbox>
+        </div>
+      </div>
+    </div>
+  </mat-expansion-panel>
+</mat-accordion>
+</div>
+<!--SPELLS - coming up in 0.10-->
+<div class="page" id="spellsSection" *ngIf="currentClass != undefined && currentClass.mana>0">
+<hr class="purple-border">
+<h2 class="section-header purple">Spells</h2>
+<hr class="purple-border">
+  Coming soon in 0.10...
+</div>
+<!--MANEUVERS - coming up in 0.10-->
+<div class="page" id="maneuversSection" *ngIf="currentClass != undefined && currentClass.stamina>0">
+<hr class="purple-border">
+<h2 class="section-header purple">Manuevers</h2>
+<hr class="purple-border">
+  Coming soon in 0.10...
+</div>
+
+<!--Armor-->
+<div class="page" id="armorSection">
+<hr class="purple-border">
+<h2 class="section-header purple">Armor</h2>
+<hr class="purple-border">
+<div class="page-container">
+  <div class="top-inputs">
+    <mat-form-field appearance="outline" class="top-field">
+      <mat-label>Precision Defense</mat-label>
+      <input matInput name="precisionDefense" class="top-input-field" type="number" 
+      style="font-size: 35px;" [readonly]="true" [(ngModel)]="character.precisionDefense"/>
+    </mat-form-field>
+        <mat-form-field appearance="outline" class="top-field">
+      <mat-label>Area Defense</mat-label>
+      <input matInput name="areaDefense" class="top-input-field" type="number" 
+      style="font-size: 35px;" [readonly]="true" [(ngModel)]="character.areaDefense"/>
+    </mat-form-field>
+  </div>
+  </div>
+  </div>
+  <!--CHANGE THE LOGIC HERE TO BE ANALAGOUS AS FOR THE CLASSES-->
+  <mat-accordion>
+  <mat-expansion-panel #panel>
+    <mat-expansion-panel-header>
+      <mat-checkbox [(ngModel)]="isWearingArmor" (click)="onArmorDon(panel)">
+      </mat-checkbox>
+      <span class="class-name">Armor</span>
+    </mat-expansion-panel-header>
+    <!--visible only if you're wearing armor-->
+
+  <!---->
+  <div class="form-container">
+    <form class="points-form">
+      <mat-form-field appearance="outline" class="remaining-field">
+      <mat-label>Armor Points</mat-label>
+      <input matInput type="number" [readonly]="true" 
+        name="remainingArmorPoints" class="section-header" [(ngModel)]="armorPoints"/>
+    </mat-form-field>
+    </form>
+  </div>
+
+<div class="radio-container">
+  <mat-radio-group [(ngModel)]="selectedArmorType">
+    <mat-radio-button color="primary" value="Light">Light</mat-radio-button>
+    <mat-radio-button color="primary" value="Heavy"
+      *ngIf="currentClass == undefined || currentClass.armorTraining == 'Heavy'">
+      Heavy
+    </mat-radio-button>
+    <mat-radio-button color="primary" value="Heavy" disabled
+      *ngIf="currentClass != undefined && currentClass.armorTraining != 'Heavy'">
+      Heavy
+    </mat-radio-button>
+  </mat-radio-group>
+</div>
+
+<div class="subtalents">
+        <p *ngFor="let p of legalArmorProierties">
+          <em class="semi-bold">({{p.cost}}) {{ p.name }} {{p.helperText}}:</em> 
+          <mat-checkbox color="primary" *ngFor="let o of p.options" [(ngModel)]="o.selected" (click)="onArmorOptionClicked(o,p.options,p)">
+
+          </mat-checkbox>
+        </p>
+</div>
+  <!---->
+  </mat-expansion-panel>
+</mat-accordion>
+  <mat-accordion>
+  <mat-expansion-panel #panel>
+    <mat-expansion-panel-header>
+      <mat-checkbox [(ngModel)]="isWearingShield" (click)="onShieldDon(panel)">
+      </mat-checkbox>
+      <span class="class-name">Shield</span>
+    </mat-expansion-panel-header>
+      <!--visible only if you're using a shield-->
+  <!---->
+  <div class="form-container">
+    <form class="points-form">
+      <mat-form-field appearance="outline" class="remaining-field">
+      <mat-label>Shield Points</mat-label>
+      <input matInput type="number" [readonly]="true" 
+        name="remainingShieldPoints" class="section-header" [(ngModel)]="shieldPoints"/>
+    </mat-form-field>
+    </form>
+  </div>
+
+<div class="radio-container">
+  <mat-radio-group [(ngModel)]="selectedShieldType">
+    <mat-radio-button color="primary" value="Light">Light</mat-radio-button>
+    <mat-radio-button color="primary" value="Heavy"
+      *ngIf="currentClass == undefined || currentClass.armorTraining == 'Heavy'">
+      Heavy
+    </mat-radio-button>
+    <mat-radio-button color="primary" value="Heavy" disabled
+      *ngIf="currentClass != undefined && currentClass.armorTraining != 'Heavy'">
+      Heavy
+    </mat-radio-button>
+  </mat-radio-group>
+</div>
+
+<div class="subtalents">
+        <p *ngFor="let p of legalShieldProierties">
+          <em class="semi-bold">({{p.cost}}) {{ p.name }} {{p.helperText}}:</em> 
+          <mat-checkbox color="primary" *ngFor="let o of p.options" [(ngModel)]="o.selected" (click)="onShieldOptionClicked(o,p.options,p)">
+
+          </mat-checkbox>
+        </p>
+</div>
+    </mat-expansion-panel>
+  </mat-accordion>
+
+  <!--
+    Options to choose depending on armor type AND shield options to choose depending on type of shield.
+    the armor options should be visible only after checking a check box with armor, and the same for shield
+    and guard weapon 
+   -->
+<!--FINISH-->
+<div class="main-container">
+<div class="page-finish" id="finishSection">
+<hr class="purple-border">
+<h2 class="section-header purple">FINISH</h2>
+<hr class="purple-border">
+<br>
+<div [ngClass]="{'error-look':!isNameChosen}">
+<div class="centered-container">
+  <mat-form-field appearance="outline" class="wide-field">
+    <mat-label [ngClass]="{'error-text':!isNameChosen}">Name</mat-label>
+    <input
+      name="characterName"
+      matInput
+      type="text"
+      minlength="1"
+      maxlength="15"
+      [(ngModel)]="character.name"
+      (change)="validateName()"
+    />
+  </mat-form-field>
+</div>
+</div>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+    <div class="finish-button-container">
+    <button mat-raised-button color="primary" class="finish-button" (click)="onFinishClicked()">
+      Finish Character
+    </button>
+  </div>
+</div>
+</div>
+</div>
+ </mat-sidenav-content>
+</mat-sidenav-container>
+
+
+
+

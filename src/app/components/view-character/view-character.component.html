@@ -1,0 +1,191 @@
+ <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+<mat-sidenav-container>
+<mat-sidenav #sidenav position="end" appSwipe (swipeRight)="closeSidenav(sidenav)" 
+    class="purple-sidenav">
+ <mat-nav-list>
+    @for (s of sections; track s) {
+        <div *ngIf="!((s=='Maneuvers' && character.stamina==0)||(s=='Spells' && character.mana==0))">
+            <a mat-list-item (click)="navigateToSection(s)">
+              {{s}}
+            </a>
+            <hr>
+        </div>
+    }
+ </mat-nav-list>
+</mat-sidenav>
+<mat-sidenav-content
+  appSwipe
+  (swipeLeft)="openSidenav(sidenav)">
+<!--INITIAL PAGE-->
+<!-- Name, Class, Level -->
+<div class="purple-background vertical-padding" id="Combat">
+<h1 class="section-header purple-background">
+    {{character.name}}, {{character.characterClass?.name}} ({{character.level}})
+</h1>
+</div>
+<div class="form-container">
+<form class="points-form">
+  <!-- HP -->
+  <mat-form-field appearance="outline" class="points-field">
+    <mat-label>Health Points <mat-icon>favorite</mat-icon></mat-label>
+    <input matInput [readonly]="true" value="12" style="font-size: 45px;" class="stats" name="hp"
+        [(ngModel)]="character.healthPoints"/>
+  </mat-form-field>
+
+  <!-- Defenses -->
+  <div class="input-row">
+    <mat-form-field appearance="outline" class="points-field-medium">
+      <mat-label>Precision Defense <mat-icon>shield</mat-icon></mat-label>
+      <input matInput [readonly]="true" value="12" style="font-size: 45px;" class="stats" name="pd"
+        [(ngModel)]="character.precisionDefense"/>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="points-field-medium">
+      <mat-label>Area Defense <mat-icon>fort</mat-icon></mat-label>
+      <input matInput [readonly]="true" value="12" style="font-size: 45px;" class="stats" name="ad"
+        [(ngModel)]="character.areaDefense"/>
+    </mat-form-field>
+  </div>
+
+  <!--Combat info-->
+  <table mat-table [dataSource]="statsTableDataSource" class="mat-elevation-z8 my-table">
+  <ng-container id="Attack" matColumnDef="Attack">
+    <th mat-header-cell *matHeaderCellDef> Attack modifier </th>
+    <td mat-cell *matCellDef="let element"> {{element.attack}} </td>
+  </ng-container>
+  <ng-container matColumnDef="Save DC">
+    <th mat-header-cell *matHeaderCellDef> Save DC </th>
+    <td mat-cell *matCellDef="let element"> {{element.saveDc}} </td>
+  </ng-container>
+  <ng-container matColumnDef="Combat Mastery">
+    <th mat-header-cell *matHeaderCellDef> Combat Mastery </th>
+    <td mat-cell *matCellDef="let element"> {{element.combatMastery}} </td>
+  </ng-container>
+  <ng-container matColumnDef="Speed ">
+    <th mat-header-cell *matHeaderCellDef> Speed </th>
+    <td mat-cell *matCellDef="let element"> {{element.speed}} </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="combatStatsColumnNames"></tr>
+  <tr mat-row *matRowDef="let row; columns: combatStatsColumnNames;"></tr>
+</table>
+
+  <!-- Stamina/Mana -->
+  <div *ngIf="character.mana > 0 && character.stamina > 0" class="input-row">
+  <mat-form-field appearance="outline" class="points-field-small">
+    <mat-label>Mana <mat-icon>bolt</mat-icon></mat-label>
+    <input matInput [readonly]="true" value="67" style="font-size: 30px;" class="stats" name="mp"
+        [(ngModel)]="character.mana"/>
+  </mat-form-field>
+  <mat-form-field appearance="outline" class="points-field-small">
+    <mat-label>Stamina <mat-icon>swords</mat-icon></mat-label>
+    <input matInput [readonly]="true" value="67" style="font-size: 30px;" class="stats" name="sp"
+        [(ngModel)]="character.stamina"/>
+  </mat-form-field>
+  </div>
+
+  <mat-form-field appearance="outline" class="points-field-small"
+    *ngIf="character.mana > 0 && character.stamina == 0">
+    <mat-label>Mana <mat-icon>bolt</mat-icon></mat-label>
+    <input matInput [readonly]="true" value="67" style="font-size: 30px;" class="stats" name="mp"
+        [(ngModel)]="character.mana"/>
+  </mat-form-field>
+  <mat-form-field appearance="outline" class="points-field-small"
+    *ngIf="character.stamina > 0 && character.mana == 0">
+    <mat-label>Stamina <mat-icon>swords</mat-icon></mat-label>
+    <input matInput [readonly]="true" value="67" style="font-size: 30px;" class="stats" name="sp"
+        [(ngModel)]="character.stamina"/>
+  </mat-form-field>
+
+  <!-- Stamina regen -->
+  <p class="centered-text">This is some information text.</p>
+  </form>
+</div>
+<br>
+<!--ATTRIBUTES AND SKILLS-->
+<div id="Attributes"></div>
+<hr class="purple-border">
+<h2 class="section-header purple">Attributes & Skills</h2>
+<hr class="purple-border">
+<div class="form-container">
+    <form class="points-form">
+        <div class="attributes-row">
+            <!--Attributes-->
+            <mat-form-field appearance="outline" class="attribute-points-field"
+                *ngFor="let attribute of character.attributes">
+            <mat-label>{{attribute.name}}</mat-label>
+            <input matInput [readonly]="true" [value]="attribute.name" style="font-size: 30px;" class="stats" 
+                [name]="attribute.name"
+                [(ngModel)]="attribute.value"/>
+            </mat-form-field>
+        </div>
+    <!--Skills-->
+    <div id="SkillsAndTrades"></div>
+    <table mat-table [dataSource]="skillsTrained" class="mat-elevation-z8 my-table">
+    <ng-container id="Skill" matColumnDef="Skill">
+        <th mat-header-cell *matHeaderCellDef> Skill/Trade </th>
+        <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+    </ng-container>
+    <ng-container matColumnDef="Attribute">
+        <th mat-header-cell *matHeaderCellDef> Attribute </th>
+        <td mat-cell *matCellDef="let element"> {{element.attribute}} </td>
+    </ng-container>
+    <ng-container matColumnDef="Total Modifier">
+        <th mat-header-cell *matHeaderCellDef> Modifier</th>
+        <td mat-cell *matCellDef="let element"> +{{formatSkillModifier(element)}} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="skillsColumnNames"></tr>
+    <tr mat-row *matRowDef="let row; columns: skillsColumnNames;"></tr>
+    </table>
+        <!--Trades-->
+    <table mat-table [dataSource]="tradesTrained" class="mat-elevation-z8 my-table">
+    <ng-container id="Skill" matColumnDef="Trade">
+        <th mat-header-cell *matHeaderCellDef> Trade </th>
+        <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+    </ng-container>
+    <ng-container matColumnDef="Trade Modifier">
+        <th mat-header-cell *matHeaderCellDef>Trade Modifier</th>
+        <td mat-cell *matCellDef="let element"> +{{formatTradeModifier(element)}} </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="tradesColumnNames"></tr>
+    <tr mat-row *matRowDef="let row; columns: tradesColumnNames;"></tr>
+    </table>
+    </form>
+</div>
+    <!--ACTIONS-->
+    <div id="Actions">
+    <hr class="purple-border">
+    <h2 class="section-header purple">Actions</h2>
+    <hr class="purple-border">
+    <div class="form-container">
+        <form classs="points-form">
+
+        </form>
+    </div>
+
+    <div id="Finish">
+    <hr class="purple-border">
+    <h2 class="section-header purple">FINISH</h2>
+    <hr class="purple-border">
+    
+    <div class="form-container">
+        <form class="points-form">
+            <div class="input-row">
+        <button mat-raised-button color="primary" class="icon-button-left" (click)="onBackClicked()">
+        <mat-icon  class="icon-left" >keyboard_arrow_left</mat-icon>
+            <span class="margin-right">Back</span>
+        </button>
+        <button mat-raised-button color="primary" class="icon-button-right green-look" (click)="onDoneClicked()">
+            <span class="margin-left">Done</span>
+        <mat-icon class="icon-right" >keyboard_arrow_right</mat-icon>
+        </button>
+            </div>
+        </form>
+    </div>
+     <br>
+    </div>
+</div>
+</mat-sidenav-content>
+</mat-sidenav-container>
+

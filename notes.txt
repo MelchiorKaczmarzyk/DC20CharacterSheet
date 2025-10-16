@@ -1,0 +1,376 @@
+Components:
+1. app component (choose whether to create or use)
+2. create component (create a lvl 1 character)
+3. view component (summary of created character, it will use the same layout as later 
+actually using the character sheet and the purpose of this component so far is to test
+that layout)
+JEST INACZEJ TERAZ
+app component to nadzorujący komponent zawierający wszystko i wyświetlający outletem
+ALBO WelcomeComponent ALBO CreateSheetComponent. Kliknięcie guzika create w WelcomeComponent
+powoduje przenawigowanie z powrotem do AppComponent, ale tak, że on teraz wyświetla
+CreateSheetComponent i można zrobić postać.
+
+Nawigację ustalono na scroll + side bar
+
+TIMELINE
+Strony -> side nawigacja z routami, guardami i walidacją -> podgląd końcowy -> estetyka
+
+//DONE
+WelcomeComponent musi po kliknięciu guzika wysłać AppComponent, że musi teraz 
+routować do create sheet, a nie do welcome.
+
+Zaczynamy pracę nad umożliwieniem tworzenia postaci
+//DONE
+1. Atrybuty (form!)
+- 4 pola w centralnej kolumnie
+- strzałki góra/dół przy polu do zwiększania lub zmniejszania
+- max 3 w polu
+- min -2 w polu
+- pole z widocznymi punktami, które zostały (pointbuy)
+
+//DONE
+2. Skille
+- przypisanie skilli atrybutom
+- liczba skill pointów zależna od inteligencji
+- w TYLKO JEDNYM skillu może być adept za 3 punkty
+- 3 miejsca na tradey, gdzie można wpisać swoją nazwę
+- Skill point - Trade point 1:2
+Jakiś komunikat not enough skill points czy coś się powinien robić może hmmm
+
+//DONE
+3. Trady
+- ileśtam inputów tekstowych do wpisania, np 6-7
+- wyświetlenie trade pointów
+- radio buttony tak jak do skilli obok, novice albo adept
+JAK NAJWIĘCEJ POWTÓRZ Z TYCH SKILLI LAYOUTU I LOGIKI BUTTONÓW
+
+Napisz analogiczne novice i adept metody do ogarniania przycisków do traidów
+Wymyśl jakiś ngfor do zrobienia tego samego dla każdego tradea
+
+//DONE
+4. Ancestry
+- Pole z Ancestry Points (5)
+- Widok (najpierw dla jednego, potem do ngfor)
+Zrób ngFor wszystko, ale ten powtarzający się template będzie miał sekcję ngIf, która będzie do
+specjalnego wyświetlania Skill Expertise i Trade Expertise tak, że to będą osobne traity (dodaj do jsona)
+dla każdego skilla i tradea, ale widoczne będą tylko te legalne
+ALE WTEDY BĘDZIE MOŻNA WZIĄĆ 2 RAZY EXPERTISE
+Otóż nie, bo użyjesz isAdept, żeby nie można było wziąć Skill Expertise, jeśli isAdept, a żeby
+nie można było wziąć Trade Expertise kiedy już masz Trade Expertise użyjesz nowej zmiennej, która
+będzie się checkowała, kiedy weźmiesz ten ancestry trait.
+Skill Expertise -> jeśli NIE jesteś jeszcze adeptem w żadnym skillu
+Trade Expertie -> jeśli NIE wziąłeś jeszcze Trade Expertise
+- TYLKO JEDEN za 0
+- MAX -2
+- MAX 2 Ancestry, CHYBA ŻE Limitless jest zaznaczone
+
+Widok ogólnie już działa, teraz została logika, czyli:
+- Zużywanie ancestry pointów
+- Tylko 2 ancestries, CHYBA ŻE Limitless Ancestries zaznaczone
+- Kiedy wybierasz ancestry, a nie masz traita za zero, to wybiera Ci się jego trait za 0
+- Kiedy odklikniesz ancestry, odklikują się wszystkie jego traity
+------------------------------------------------------------------------------------------------
+- możesz zaznaczać traity tylko, jeśli zaznaczysz to ancestry
+- możesz mieć tylko 1 trait za 0 (masz ten którego ancestry zaznaczysz pierwsze po prostu)
+- jeśli klikniesz na trait dający Adept, nie możesz zaznaczyć drugiego takiego traitu
+------------------------------------------------------------------------------------------------
+- JEŻELI Skill ALBO Trade Expertie ALBO Atribute decrease/increase są wybrane, TO WTEDY 
+    na dole się pojawia dropdown, do wybrania skilla lub tradea lub atrybutu odpowiedniego!
+------------------------------------------------------------------------------------------------
+Misja na teraz:
+//DONE???
+- Po wybraniu wartości ona się nie ustawia ładnie w tym polu, A POWINNA.
+    ^ problem jest taki, że jak wybierzesz tę opcję, to już przestaje być legalna opcja i dlatego
+    znika z tego pola.
+    Propozycja naprawy 1: jednak nie używaj get properties, tylko ręcznie uaktualnianych przy
+        klikaniu atrybutów, skilli i tradów tablic, wtedy kliknięcie opcji nie będzie jej wywalało
+        z dostępnych opcji.
+
+//DONE
+- Te metody wywoływane na wybraniu wartości muszą też odkęcać swój poprzedni efekt, jeśli
+    zostanie potem wybrana nowa wartość.
+pole z charyzmą ma jakiś name albo id zły chyba, bo wygląda jakby było klikane przy klikaniu innych
+kiedy wbijam 3 w zwiększonym atrybucie to znika z pola (bo przestaje być legalną opcją znowuuuu)
+    (i to samo jak wbijam -2 na zmniejszonym)
+
+------------------------------------------------------------------------------------------------
+Doszlifować manageSkillsForAncestries, manageTradeForAncestries,
+ onSkillForExpertiseChosen i onTradeForExpertiseChosen
+ - jak odznaczę trait, to nie mogę go zaznaczyć potem : /
+ - obecnie możesz mieć expertise z traita i pointów naraz, A NIE POWINNO TAK BYĆ
+    (max 1 w skillu i 1 w tradzie, ALE z punktów tylko 1, do drugiego trait)
+- KIEDY ODZNACZASZ te skomplikowane traity, to musisz wycofać ich efekt
+------------------------------------------------------------------------------------------------
+- coś nie działa ze zwracaniem ancestry pointów do końca
+    kiedy wybierzesz Trade Expertise lub Skill Expertise i wybierzesz trade/skill, a potem
+    odznaczysz ten trait (nie ancestry), to nie zwracają się ancestry pointy
+- czy poprawnie nie możesz wybrać skill/trait expertise jeśli już masz adept?
+------------------------------------------------------------------------------------------------
+- Faktycznie nie możesz zaznaczyć Skill/Trade Expertise, jak już masz Adept, ALE klikanie go
+    i tak odznacza Ci adept.
+- Coś sie kiełbasi z trade pointami, dodawanie ich nie działa tak ładnie całkiem.
+------------------------------------------------------------------------------------------------
+
+Pozostają jeszcze potencjalnie kłopotliwe inne Attribute increase Traity, ale to będę je mógł
+    tak samo potraktować jak Attribute Increase i będzie git.
+    BĘDZIESZ JESZCZE DODAWAŁ W 10. BRAKUJĄCY CONTENT TO WTEDY
+5. Klasy
+- Tylko 1 na raz (odznacza się poprzednia kiedy zaznaczasz następną)
+- Zwijanie i rozwijanie jak w Ancestries
+
+- Pole z wybraną klasą, które odzwierciedla wybrane rzeczy (to teoretycznie może być innej klasy
+    obiekt niż są te w jsonie, bo one są trochę pod layout, ale nwm jeszcze)
+- Efekt wybrania klasy i odkręcanie przy odznaczeniu (hp, sp, mp, manewry do wybrania, cantripy
+    do wybrania, ale tu też wszystkie klasy by już musiały być dodane)
+- Efekt wybrania poszczególnych opcji (uf, tu będzie trzeba osobno obsługę i wycofania każdej opcji
+    zaprogramować.)
+NA RAZIE POCZEKAJ Z TYMI ^, bo wszystkie klasy trzebaby dodać, żeby to miało sens. Możesz dodać
+jeszcze jakiegoś castera, żeby wybieranie spelli przetestować, a potem przejdź dalej.
+
+6. Manewry / Spelle (TU BĘDZIE DUŻY REWORK, WIĘC NWM)
+- Odpowiednia sekcja zależnie od tego, czy wybrana klasa ma manę/staminę
+- Przemyśl layout
+Dodaj manewry i spelle dopiero jak już będziesz dodawał content, bo layoucie i po klasach.
+
+7. Layout, przeliczenie hp i defensów itd (i export do pliku odtwarzalnego)
+To ma być już próbka tego podglądu do używania tej karty, nowy komponent, do którego się robi przejście
+    z tymi zakładkami z klasą, ancestry, spellami, manewrami i akcjami, ALE ma być możliwość wrócenia
+    stamtąd do edytowania.
+Navbar z boku i na nim będzie możliwość przejścia z powrotem do tworzenia. Przejście DO PODGLĄDU 
+    będzie guziorem na końcu.
+
+    INFO NA LAYOUCIE
+    - Name
+    - Class
+    - Level
+    - CM
+    - HP
+    - PD
+    - AD/MD
+    - Attributes
+    - Skills
+    - Resistances
+    - MP
+    - SP
+    - Attack +
+    - Save DC
+    - Speed
+
+    Sekcje:
+    - Main* (name, class, level, hp, defenses, attributes, skills, attack modifier, dc, speed)
+    - Features (passives)
+    - Actions
+    - Spells
+    - Maneuvers
+    - Class
+    - Ancestry
+
+DODAJ ARMOR BUILDER PERHAPS?
+
+
+8. Side navbary
+- Pierwszy: nawigacja po sekcjach tworzenia postaci 
+- Drugi: sekcje używania karty, powrót do tworzenia, żeby modyfikacje wprowadzić
+- Tryb nocny
+
+9. Odpowiedź UI
+
+10. Dodaj brakujący content
+
+------------------------------------------------------------------------------------------------
+JAK DO TEJ LINI ^ BĘDZIE ZROBIONE, TO WCHODZIMY DO FAZY 2
+    (podgląd wybranej karty na rządanie, firebase storage)
+
+- walidacja pól 
+    1. giga metoda  <------------ TO
+    2. template driven validacja
+    Obejrzyj jakiś filmik o template validation
+
+    a) wyświetlanie błędów na finishu
+        + dokładna informacja o błędach
+    b) przeniesienie do najwyższego miejsca błędu
+        + clean wskazanie, gdzie coś trzeba zmienić
+        + mniejsze zaśmiecanie interfejsu
+        + brak potrzeby modyfikowania layoutu
+    
+    BŁĘDY:                              Łatwość komunikowania ich użytkownikowi
+        - niewydane attribute pointy    łatwe
+        - niewydane skill pointy        łatwe
+        - niewydane trade pointy        łatwe
+        - niewybrane ancestry           łatwe (nie można wydać ancestry pointów bez ancestry)
+        - niewydane ancestry pointy     łatwe
+        - niewybrane ancestry opcje     łatwe
+        - niewybrana klasa              nieoczywiste (custom, czerwone ramki checkboxów
+                                                        do następnego kliknięcia FINISH?
+        - niwybrane klasowe opcje       nieoczywiste (custom, rozwiń klasę i czerwone ramki checkboxów
+                                                        do następnego kliknięcia FINISH?)
+                                        WERDYKT: 
+                                        czy wystarczy przeniesienie do miejsca błędu? <- TO
+                                        czy trzeba wyświetlać błędy na finiszu?
+    Jeden problem to jest walidacja na finishu, a drugi na bierząco sygnalizowanie użytkownikowi,
+    dlaczego nie może czegoś zrobić.
+
+    Obecny plan: Rozwiązanie oparte o metody i kod.
+        1. Metoda uruchamiana na finishu sprawdza ifami, czy są błędy i gdzie.
+            nie ma -> przenosi do nowego ekranu, git
+            są     -> ustawia odpowiednie flagi aktywujące reagujący na błąd wygląd elementów,
+                      przenosi do najwyższego miejsca błędu,
+                      nie przenosi do nowego ekranu
+            To będzie osobna metoda walidacyjna wywoływana w onFinish.
+        2. Do kodu, który reaguje na akcje mogące uczynić błędny stan poprawnym stanem trzeba dodać
+            logikę (w postaci wywołania nowych metod), która w razie czego odczyni flagi aktywujące
+            reagujący na błąd wygląd komponentów.
+            Oznacza to, że gdy elementy wejdą w swój awaryjny wygląd, wyjdą z niego dopiero po wejściu
+            w poprawny plan z powrotem.
+        3. Reakcja na bierząco na błędy użytkownika, np kolor pola na czerwono jak chce zejść powyżej
+            limitu atrybutu. OBECNIE DECYDUJĘ SOBIE TO ODPÓŚCIĆ, bo zaimplementowanie tego byłoby za
+            blisko wyjaśniania użytkownikowi zasad, a przyjąłem sobie założenie, że aplikacja jest
+            przeznaczona dla ludzi znających zasady i nie ma zastępować oficjalnych DC20 zasobów.
+
+- side navbar 1
+Error handling -> side navbar -> armor builder (będziesz mussiał combat training dodać do klass jako pole) -> 
+
+    - Jak ma wyglądać armor builder? (TARCZE TEŻ)
+    Pamiętaj, że klasy mogą zmienić armor!
+    - Armor pointów nie trzeba wydać wszystkich i można mieć pustą tarczę
+
+Problem z rasowymi i klasowymi featureami: Muszę jakoś wymyślić jak to zrobić, że jak "wybierasz"
+talent, trait albo opcję, to wywołuje się specjalna dla niego metoda, która zmienia pola i robi rzecz 
+A KIEDY GO "OD-WYBIERASZ", to wywołuje się metoda cofająca zmiany.
+Pomysł: Jak będzie się ładować te klasy i ancestry z firebase'a, to one będą przepuszczane przez pipeline,
+który będzie z nich robił już obiekty mające metody i przypisywał im te metody do odpowiednich pól (te
+metody będą musiałby być w jakimś serwisie np, i ten serwis za to może odpowiadać i przechowywać to wszystko)
+Czasem te metody będą musiały być przyporządkowane do traitów, czasem to talentów, a czasem do opcji.
+Też własna metoda do tego, jak sprawdzić, czy wybrana opcja jest poprawna
+
+Wiesz co, olej to dla ancestries, one przeważnie nie mają dużo opcji, zachowaj ten taki spaghetti
+code po nazwach, nie będziesz go musiał aż tak bardzo rozwijać...
+
+Przetestuj taki pipeline z tym jsonem co masz już i też będziesz mógł layout poprawić, żeby na tym działał
+-> view component -> firebase
+
+ARMOR 
+<checkbox> <"Armor"/"Shield">
+only visible if you've checked the checkbox:
+<points to spend>
+<radio group light/heavy (inactive if untrained)>
+<hefty margin><properties to buy for appropriate category of armor/shield><checkbox or 2 to indicate, how many times the property is bought>
+
+KLASY
+- dopracowanie tego obiektu tak, żeby miał faktycznie zawsze aktualną wartość
+- zrobienie metod do obsługi klikania i odklikiwania klas i ich opcji
+    (one niech będą w tym serwisie i zaplanuj, jak to najładniej zrobić, żeby były
+    wywoływane z onClassClicked lub onClassOptionClicked, ale żeby zminimalizowac ify) 
+- TAK SAMO ARMOR I TARCZE
+
+LAYOUT
+    INFO NA LAYOUCIE
+    - Name
+    - Class
+    - Level
+    - CM
+    - HP
+    - PD
+    - AD/MD
+    - Attributes
+    - Skills
+    - Resistances
+    - MP
+    - SP
+    - Attack +
+    - Save DC
+    - Speed
+    
+Jak to podzielić?
+- Imię, klasa, level
+- HP, PD, AD
+- Stamina, mana, attack +, save DC, speed
+    1. Popraw ten header, żeby wyglądał jak inne headery sekcji (może trochę fajniej)
+    2. Wystyluj tablę tak, żeby wartości były wycentrowane, a góra była fioletowa z białym tekstem
+- Atrybuty i Skille (JAK pokazać skille?)
+metoda navigateToSection powinna być w servisie.
+
+-------------------------------------------------------------------
+- Actions   (WSZYSTKO, co możesz zrobić akcją LUB MINOR AKCJĄ! - zaznacz to jakoś)
+    1. Przeszukaj wszystkie talenty w poszukiwaniu takich z kosztem w AP.
+    2. Przeszukaj wszystkie ancestry traity w poszukiwaniu takich z kosztem w AP.
+    3. Dodaj commmon akcje.*    *zawsze to możesz zrobić później
+    4. Dodaj wszystko do jednej tabeli.
+    5. Posortuj kosztem w AP.
+    6. Wyświetl tak jak klasy, jako serię dropdownów, ale koszt powinien być już na górze.
+    7. Jak wyświetlić info dla każdej z tych akcji?
+        - Koszt
+        - Źródło
+        - Zasięg/Obszar
+        - Wywoływane checki
+        - Opis
+    8. Dodaj możliwość dodawania do ulubionych klikając gwiazdkę i one są wtedy na górze.
+    Nie wiem, czy będę wracał przerobić ancestries, może będę, ALE powinienem dodać do create character tablicę
+        akcji, manewrów i spelli, żeby można je było łatwo wyświetlić w odpowiednich sekcjach.
+    Te metody obsługujące wybór klasy powinny dodawać te akcje i one też powinny być wszystkie w zewnętrznym
+        zasobie przechowywane (a może klasy będą miały tablice akcji i będą je dodawały po prostu?
+
+WSZYSTKO CO DOTYCZY SPELLI  ALBO MANEWRÓW CZEKA NA 0.10!!!
+- Spells    (Cantripy, zaklęcia)
+- Maneuvers 
+
+- Features  (Takie pasywy to są, coś o czym musisz pamiętać, a nie czego używasz I CO NIE JEST NIGDZIE 
+    INDZIEJ NA KARCIE - np jak efekt zwiększa hp, defense, atrybuty albo skille, to go widać już)
+- Class     (WSZYSTKO, co daje Ci Twoja klasa podzielone na lvle)
+- Ancestry  (WSZYSTKO, co daje Ci Twoje ancestries podzielone na lvle)
+    To wszystko ^ będzie lista dropdownów jak klasy i ancestries, ALE może jakieś info powinno być już
+        od razu widoczne (koszty w zasobach np?, od lewej może być)
+
+NAWIGACJA PO APCE
+1. Logowanie
+2. Kolekcja kart, Opcja zrobienia nowej karty (plusik, guzior ( na dole), jakby pusta karta z plusikiem)
+    i można też usunąć kartę LUB ZLVLOWAĆ POSTAĆ (złoty kolor?).
+3. Tworzenie karty ma guzior FINISH, który przenosi do podglądu karty jak podczas jej używania, ALE
+    można się jeszcze cofnąć i pozmieniać rzeczy (na dole sidebaru BACK i FINISH)
+4. Używanie karty-podgląd (tak jak wyżej, ALE TYLKO BACK). 
+
+CO TERAZ?
+    - firebase
+        CRUD działa, na razie zrobię tak, że każdy użykownik będzie widział każdą postać, i dopiero jak
+        będzie działało już wszystko, to dodam to logowanie na pierwszy ekran i dostęp tylko do jego
+        postaci dla użytkownika
+        - z widoku viewCharacter dodajesz postać do bazy danych
+        - pop up z feedbackiem, czy się udało dodać postać, czy nie (jak nie, to nie zmieniasz widoku)
+        - *ostateczna nawigacja i widoki (widok z "galerią")
+            - Zrobienie, żeby na razie to był domyślny widok (potem logowanie będzie)
+            - Przejście z Create Character do widoku Create Character
+            - Przy usuwaniu pole, gdzie trzeba wpisać imię postaci do usunięcia
+            - Usuwanie postaci (jakieś id by było do tego potrzebne, przy dodawniu losowy guid)
+
+            - Pełne zachowanie stanu przy nawigacji (np klasa jest odznaczona jak się wróci z view to create) 
+Co trzeba zachować/przyrwócić?
+- atrybuty
+- attribute pointsy
+- skille
+- trady (buyTradePoints też)
+- ancestries
+    KNOWN ISSUE: możesz wprowadzić apkę w błędny stan, kiedy wybierzesz Skill Expertise, a potem
+    zamiast wybrać skill kupisz sobie ręcznie expertise. Trzeba wtedy wycofać zakup.
+
+- klasę (analogicznie do ancestries)
+    Musisz zmienić strukturę tego interfejsu. To się tyczy też ancestries niestety, ale postac powinna
+    mieć TYLKO nazwę klasy i ancestry, a reszta to po prostu powinny być talenty z odpowiednim źródłem.
+    Te talenty powinny być tworzone z wybranych traitów i klasowych w momencie tworzenia postaci.
+        Tylko jak tworzyć talenty z traitów i klasowych opcji?
+        
+    Zachowanie stanu można zrobić serwisem.
+    PRZEMYŚL TĘ ARCHITEKTURĘ!
+
+        - dodanie klas i ancestries do assetów
+        - obsługa wybierania klas i ancestries (możliwe opcje jak w tym do tej pory)
+        - wyświetlanie na ekranie viewCharacter akcji, klasowych talentów, ancestry traits i featerów
+        - *widok użytkowania karty (podobny, ALE INNY OD TEGO VIEW CO MASZ - np gwiazdkowanie)
+        - dodanie spelli i manewrów
+        - żeby nawigacja strzałkami działała
+        - lvlowanie
+
+
+
+NA RAZIE OLEW NA:
+- źle działające przydzielanie skillpointów
+    

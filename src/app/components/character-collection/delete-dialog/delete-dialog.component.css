@@ -1,0 +1,11 @@
+.dialog-actions {
+  display: flex;
+  justify-content: center; /* center horizontally */
+  gap: 6rem; /* put space between Cancel & Delete */
+  margin-top: 1rem;
+}
+
+p{
+  display: flex;
+  justify-content: center; /* center horizontally */
+}

@@ -1,1 +1,16 @@
 /* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+@media only screen and (max-width: 1045px){
+html, body {
+   overflow-x: clip;
+}
+}
+.mat-drawer-inner-container,
+mat-sidenav .mat-drawer-inner-container,
+mat-drawer .mat-drawer-inner-container {
+  overflow: hidden !important;          /* disable scrolling */
+  overscroll-behavior: contain !important; /* prevent touch overscroll */
+  max-height: 100vh !important;
+}

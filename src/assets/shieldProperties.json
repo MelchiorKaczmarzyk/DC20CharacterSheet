@@ -1,0 +1,152 @@
+{
+    "shieldProperties": [
+        {
+            "name":"Precision Defense increase",
+            "helperText":"",
+            "shieldOrArmor":"shield",
+            "forLight":true,
+            "forHeavy":true,
+            "cost":1,
+            "options": [
+                {
+                    "cost":1,
+                    "selected":false,
+                    "level":1
+                },
+                {
+                    "cost":1,
+                    "selected":false,
+                    "level":2
+                }
+            ]
+        },
+        {
+            "name":"Area Defense increase",
+            "helperText":"",
+            "shieldOrArmor":"shield",
+            "forLight":true,
+            "forHeavy":true,
+            "cost":1,
+            "options": [
+                {
+                    "cost":1,
+                    "selected":false,
+                    "level":1
+                },
+                {
+                    "cost":1,
+                    "selected":false,
+                    "level":2
+                }
+            ]
+        },
+        {
+            "name":"Elemental damage reduction",
+            "helperText":"",
+            "shieldOrArmor":"shield",
+            "forLight":true,
+            "forHeavy":true,
+            "cost":2,
+            "options": [
+                {
+                    "cost":2,
+                    "selected":false,
+                    "level":1
+                }
+            ]
+        },
+        {
+            "name":"Grasp",
+            "helperText":"- the hand wielding this shield can be used for grappling, reloading and versatile weapons",
+            "shieldOrArmor":"shield",
+            "forLight":true,
+            "forHeavy":false,
+            "cost":1,
+            "options": [
+                {
+                    "cost":1,
+                    "selected":false,
+                    "level":1
+                }
+            ]
+            
+        },
+        {
+            "name":"Toss",
+            "helperText":"- can be thrown as an attack (5/10)",
+            "shieldOrArmor":"shield",
+            "forLight":true,
+            "forHeavy":false,
+            "cost":1,
+            "options": [
+                {
+                    "cost":1,
+                    "selected":false,
+                    "level":1
+                }
+            ]
+            
+        },
+        {
+            "name":"Physical damage reduction",
+            "helperText":"",
+            "shieldOrArmor":"shield",
+            "forLight":false,
+            "forHeavy":true,
+            "cost":2,
+            "options": [
+                {
+                    "cost":2,
+                    "selected":false,
+                    "level":1
+                }
+            ]
+        },
+        {
+            "name":"Mounted",
+            "helperText": "- applies bonuses to your mount",
+            "shieldOrArmor":"shield",
+            "forLight":false,
+            "forHeavy":true,
+            "cost":1,
+            "options": [
+                {
+                    "cost":1,
+                    "selected":false,
+                    "level":1
+                }
+            ]
+            
+        },
+        {
+            "name":"Bulky",
+            "helperText":"- speed reduced by 1",
+            "shieldOrArmor":"shield",
+            "forLight":false,
+            "forHeavy":true,
+            "cost":-1,
+            "options": [
+                {
+                    "cost":-1,
+                    "selected":false,
+                    "level":1
+                }
+            ]
+        },
+        {
+            "name":"Rigid",
+            "helperText":"- disADV on Agility Checks",
+            "shieldOrArmor":"shield",
+            "forLight":false,
+            "forHeavy":true,
+            "cost":-1,
+            "options": [
+                {
+                    "cost":-1,
+                    "selected":false,
+                    "level":1
+                }
+            ]
+        }
+    ]
+}

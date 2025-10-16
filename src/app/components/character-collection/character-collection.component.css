@@ -1,0 +1,57 @@
+.character-grid {
+  display: grid;
+  grid-template-columns: 1fr; /* single column by default */
+  gap: 1rem;
+  padding: 1rem;
+
+  @media (min-width: 600px) {
+    grid-template-columns: repeat(2, 1fr); /* 2 columns on tablets */
+  }
+
+  @media (min-width: 900px) {
+    grid-template-columns: repeat(3, 1fr); /* 3 columns on large screens */
+  }
+}
+
+.character-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+mat-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.add-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  text-align: center;
+  color: var(--mat-sys-primary);
+  border: 2px dashed var(--mat-sys-outline);
+  background: transparent;
+}
+
+.add-character {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: 500;
+  gap: 0.5rem;
+
+  mat-icon {
+    font-size: 2rem;
+  }
+}
+.top-span {
+  display: flex;
+  justify-content: center;
+}
+.error{
+  color:red;
+}

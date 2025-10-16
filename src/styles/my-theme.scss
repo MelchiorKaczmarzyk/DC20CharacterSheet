@@ -1,0 +1,67 @@
+@use '@angular/material' as mat;
+@include mat.core();
+
+$my-red-palette: mat.define-palette(mat.$red-palette);
+
+// Define a custom palette (optional, you can use built-in ones too)
+$my-primary-palette: mat.define-palette(mat.$deep-purple-palette);
+$my-accent-palette: mat.define-palette(mat.$amber-palette);
+$my-warn-palette: mat.define-palette($my-red-palette);
+
+// Create a custom theme
+$my-custom-theme: mat.define-light-theme((
+  color: (
+    primary: $my-primary-palette,
+    accent: $my-accent-palette,
+    warn: $my-warn-palette,
+  )
+));
+
+// Include the new theme
+@include mat.all-component-themes($my-custom-theme);
+
+
+.mat-mdc-snack-bar-container .mdc-snackbar__surface {
+    --mdc-snackbar-container-color: #fe2a2a;
+}
+
+.purple-sidenav{
+.mdc-list-item:hover {
+    --mdc-list-list-item-hover-label-text-color:white;
+}
+
+.mdc-list-item__primary-text {
+    --mdc-list-list-item-label-text-color:white;
+    --mat-sidenav-container-text-color: white;
+}
+}
+
+.mat-mdc-raised-button.mat-primary.green-look
+  {
+     --mdc-protected-button-container-color: green;
+  }
+
+
+.error-look {
+.mdc-notched-outline__leading,
+.mdc-notched-outline__notch,
+.mdc-notched-outline__trailing {
+  border-color: red !important;
+}
+.mat-mdc-checkbox{
+    --mdc-checkbox-unselected-icon-color: red;
+}
+.mat-mdc-checkbox.mat-primary{
+    --mdc-checkbox-unselected-icon-color: red;
+}
+}
+/* Applies to all Angular Material tables in your app */
+.mat-mdc-table .mat-mdc-header-cell,
+.mat-mdc-table .mat-mdc-cell,
+.mat-mdc-table .mat-mdc-footer-cell {
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+}
+
+

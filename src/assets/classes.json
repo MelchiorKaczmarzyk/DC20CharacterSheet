@@ -1,0 +1,145 @@
+{
+    "classes": [
+        {
+            "selected": false,
+            "name": "Rogue",
+            "armorTraining": "Light",
+            "mana": 0,
+            "cantripsKnown": 0,
+            "spellsKnown": 0,
+            "stamina": 1,
+            "manueversKnown": 4,
+            "hp": 9,
+            "talents": [
+                {
+                    "class":"Rogue",
+                    "name": "Rogue Martial Path",
+                    "costAP": 0,
+                    "costMP": 0,
+                    "costSP": 0,
+                    "levelRequirement": 1,
+                    "numberOfOptionsToChoose": 0,
+                    "options": [],
+                    "text":"You gain the following Combat Training and the way to regain Stamina Points:",
+                    "subTalents": [
+                        {
+                            "name":"Combat Training",
+                            "text":"Weapons, Light Armor, Light Shields"
+                        },
+                        {
+                            "name":"Stamina Regen",
+                            "text":"Once per round, you can regain up to half your maximum SP when you hit a target who is Prone, Flanked, affected by at least 1 Condition or who you are hidden from or you gain the benefits of your Cunning Action."
+                        }
+                    ]
+                    
+                },
+                {
+                    "class": "Rogue",
+                    "name": "Debilitating Strike",
+                    "costAP": 0,
+                    "costSP": 1,
+                    "costMP": 0,
+                    "levelRequirement": 1,
+                    "numberOfOptionsToChoose":0,
+                    "options": [],
+                    "text": " When you make an Attack with a Weapon, you can spend 1 SP to force the target to make a Physical Save against your Save DC. Save Failure: Until the start of your next turn, the target suffers 1 of the following effects of your choice: Deafened, Exposed, Hindered, or Slowed 2. A target can’t be affected by the same option more than once at a time.",
+                    "subTalents": []
+                },
+                {
+                    "class": "Rogue",
+                    "name": "Roguish Finesse",
+                    "costAP": 0,
+                    "costSP": 0,
+                    "costMP": 0,
+                    "levelRequirement": 1,
+                    "numberOfOptionsToChoose":1,
+                    "options": [
+                        {
+                            "selected": false,
+                            "name": "Awarness Expertise",
+                            "text": "Your Skill Mastery Limit and your Skill Mastery in Awarness increases by 1."
+                        },
+                        {
+                            "selected": false,
+                            "name": "Athletics Expertise",
+                            "text": "Your Skill Mastery Limit and your Skill Mastery in Athlerics increases by 1."
+                        },
+                        {
+                            "selected": false,
+                            "name": "Intimidation Expertise",
+                            "text": "Your Skill Mastery Limit and your Skill Mastery in Intimidation increases by 1."
+                        },
+                        {
+                            "selected": false,
+                            "name": "Acrobatics Expertise",
+                            "text": "Your Skill Mastery Limit and your Skill Mastery in Acrobatics increases by 1."
+                        },
+                        {
+                            "selected": false,
+                            "name": "Trickery Expertise",
+                            "text": "Your Skill Mastery Limit and your Skill Mastery in Trickery increases by 1."
+                        },
+                        {
+                            "selected": false,
+                            "name": "Stealth Expertise",
+                            "text": "Your Skill Mastery Limit and your Skill Mastery in Stealth increases by 1."
+                        },
+                        {
+                            "selected": false,
+                            "name": "Animal Expertise",
+                            "text": "Your Skill Mastery Limit and your Skill Mastery in Animal increases by 1."
+                        },
+                        {
+                            "selected": false,
+                            "name": "Influrnce Expertise",
+                            "text": "Your Skill Mastery Limit and your Skill Mastery in Influrnce increases by 1."
+                        },
+                        {
+                            "selected": false,
+                            "name": "Insight Expertise",
+                            "text": "Your Skill Mastery Limit and your Skill Mastery in Insight increases by 1."
+                        },
+                        {
+                            "selected": false,
+                            "name": "Investigation Expertise",
+                            "text": "Your Skill Mastery Limit and your Skill Mastery in Investigation increases by 1."
+                        },
+                        {
+                            "selected": false,
+                            "name": "Medicine Expertise",
+                            "text": "Your Skill Mastery Limit and your Skill Mastery in Medicine increases by 1."
+                        },
+                        {
+                            "selected": false,
+                            "name": "Survival Expertise",
+                            "text": "Your Skill Mastery Limit and your Skill Mastery in Survival increases by 1."
+                        }
+                    ],
+                    "text": "You gain the following benefits:",
+                    "subTalents": [
+                        {
+                            "name": "Cunning action",
+                            "text": "You gain movement equal to half your Speed when you take the Disengage, Feint, or Hide Actions. You can use this movement immediately before or after you take the Action."
+                        },
+                        {
+                            "name": "Skill Expertise",
+                            "text": "Your Skill Mastery Limit and your Skill Mastery in a chosen skill increases by 1, up to Grandmaster (+10). A Skill can only benefit from one increase to its Mastery limit."
+                        }
+                    ]
+                },
+                {
+                    "class": "Rogue",
+                    "name": "Cypher Speech (Flavor Feature)",
+                    "costAP": 0,
+                    "costSP": 0,
+                    "costMP": 0,
+                    "levelRequirement": 1,
+                    "numberOfOptionsToChoose":0,
+                    "options": [],
+                    "text": "You become Fluent in a Mortal Language of your choice. Additionally, you understand how to speak in code with a specific demographic of your choice (such as upper society, lower society, a faction, etc.). Your coded messages can be concealed in normal conversation and written communications. This allows you to leave simple messages such as “Safety” , “Threat” , or “Wealth” , or mark the location of a cache, a secret passageway, a safehouse, or an area of danger.",
+                    "subTalents": []
+                }
+            ]  
+        }
+    ]
+}

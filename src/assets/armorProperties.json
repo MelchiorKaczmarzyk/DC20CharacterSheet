@@ -1,0 +1,104 @@
+{
+    "armorProperties": [
+        {
+            "name":"Precision Defense increase",
+            "helperText":"",
+            "shieldOrArmor":"armor",
+            "forLight":true,
+            "forHeavy":true,
+            "cost":1,
+            "options": [
+                {
+                    "cost":1,
+                    "selected":false,
+                    "level":1
+                },
+                {
+                    "cost":1,
+                    "selected":false,
+                    "level":2
+                }
+            ]
+        },
+        {
+            "name":"Area Defense increase",
+            "helperText":"",
+            "shieldOrArmor":"armor",
+            "forLight":true,
+            "forHeavy":true,
+            "cost":1,
+            "options": [
+                {
+                    "cost":1,
+                    "selected":false,
+                    "level":1
+                },
+                {
+                    "cost":1,
+                    "selected":false,
+                    "level":2
+                }
+            ]
+        },
+        {
+            "name":"Elemental damage reduction",
+            "helperText":"",
+            "shieldOrArmor":"armor",
+            "forLight":true,
+            "forHeavy":true,
+            "cost":2,
+            "options": [
+                {
+                    "cost":2,
+                    "selected":false,
+                    "level":1
+                }
+            ]
+        },
+        {
+            "name":"Physical damage reduction",
+            "helperText":"",
+            "shieldOrArmor":"armor",
+            "forLight":false,
+            "forHeavy":true,
+            "cost":2,
+            "options": [
+                {
+                    "cost":2,
+                    "selected":false,
+                    "level":1
+                }
+            ]
+        },
+        {
+            "name":"Bulky",
+            "helperText":"- speed reduced by 1",
+            "shieldOrArmor":"armor",
+            "forLight":false,
+            "forHeavy":true,
+            "cost":-1,
+            "options": [
+                {
+                    "cost":-1,
+                    "selected":false,
+                    "level":1
+                }
+            ]
+        },
+        {
+            "name":"Rigid",
+            "helperText":"- disADV on Agility Checks",
+            "shieldOrArmor":"armor",
+            "forLight":false,
+            "forHeavy":true,
+            "cost":-1,
+            "options": [
+                {
+                    "cost":-1,
+                    "selected":false,
+                    "level":1
+                }
+            ]
+        }
+    ]
+}

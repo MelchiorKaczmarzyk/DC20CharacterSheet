@@ -1,0 +1,141 @@
+{
+    "ancestries": [
+        {
+            "name": "Human",
+            "selected": false,
+            "traits": [
+                {
+                    "name": "Unyielding",
+                    "cost": 0,
+                    "selected": false,
+                    "costAP": 0,
+                    "costMP": 0,
+                    "costSP": 0,
+                    "text": "You have ADV on Saves against the Doomed Condition.",
+                    "hasOptions": false,
+                    "options": [],
+                    "optionSelected": ""
+                },
+                {
+                    "name": "Attribute Increase",
+                    "cost": 2,
+                    "selected": false,
+                    "costAP": 0,
+                    "costMP": 0,
+                    "costSP": 0,
+                    "text": "Choose an Attribute. The chosen Attribute increases by 1 (up to the Attribute Limit). ",
+                    "hasOptions": true,
+                    "options": [],
+                    "optionSelected": ""
+                },
+                {
+                    "name": "Skill Expertise",
+                    "cost": 2,
+                    "selected": false,
+                    "costAP": 0,
+                    "costMP": 0,
+                    "costSP": 0,
+                    "text": "Choose a Skill. Your Mastery Cap and Mastery Level in the chosen Skill both increase by 1. You can only benefit from 1 Feature that increases your Skill Mastery Limit at a time.",
+                    "hasOptions": true,
+                    "options": [],
+                    "optionSelected": ""
+                },
+                {
+                    "name": "Human Resolve",
+                    "cost": 1,
+                    "selected": false,
+                    "costAP": 0,
+                    "costMP": 0,
+                    "costSP": 0,
+                    "text": "Your Death’s Door Threshold value is expanded by 1.",
+                    "hasOptions": false,
+                    "options": [],
+                    "optionSelected": ""
+                },
+                {
+                    "name": "Trade Expertise",
+                    "cost": 1,
+                    "selected": false,
+                    "costAP": 0,
+                    "costMP": 0,
+                    "costSP": 0,
+                    "text": "Choose a Trade. Your Mastery Cap and Mastery Level in the chosen Trade both increase by 1. You can only benefit from 1 Feature that increases your Trade Mastery Limit at a time.",
+                    "hasOptions": true,
+                    "options": [],
+                    "optionSelected": ""
+                },
+                {
+                    "name": "Human Determination",
+                    "cost": 1,
+                    "selected": false,
+                    "costAP": 0,
+                    "costMP": 0,
+                    "costSP": 0,
+                    "text": "Once per Combat, you can give yourself ADV on an Attack Check or Spell Check while Bloodied.",
+                    "hasOptions": false,
+                    "options": [],
+                    "optionSelected": ""
+                },
+                {
+                    "name": "Unbreakable",
+                    "cost": 1,
+                    "selected": false,
+                    "costAP": 0,
+                    "costMP": 0,
+                    "costSP": 0,
+                    "text": " You have ADV on Death Saves.",
+                    "hasOptions": false,
+                    "options": [],
+                    "optionSelected": ""
+                },
+                {
+                    "name": "Attribute Decrease",
+                    "cost": -1,
+                    "selected": false,
+                    "costAP": 0,
+                    "costMP": 0,
+                    "hasOptions": true,
+                    "costSP": 0,
+                    "text": "Choose an Attribute. The chosen Attribute decreases by 1 (no less than -2). ",
+                    "options": [],
+                    "optionSelected": ""
+                }
+
+            ]
+        },
+        {
+            "name": "Elf",
+            "traits": [
+                {
+                    "name": "Discerning Sight",
+                    "cost": 0,
+                    "selected": false,
+                    "costAP": 0,
+                    "costMP": 0,
+                    "costSP": 0,
+                    "text": "You have ADV on Checks and Saves made to discern through visual illusions.",
+                    "hasOptions": false,
+                    "options": [],
+                    "optionSelected": ""
+                }
+            ]
+        },
+        {
+            "name": "Dwarf",
+            "traits": [
+                {
+                    "name": "Iron Stomach",
+                    "cost": 0,
+                    "selected": false,
+                    "costAP": 0,
+                    "costMP": 0,
+                    "costSP": 0,
+                    "text": "You have ADV on Saves against effects that come from consuming food or liquids.",
+                    "hasOptions": false,
+                    "options": [],
+                    "optionSelected": ""
+                }
+            ]
+        }
+    ]
+}

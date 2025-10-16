@@ -1,0 +1,38 @@
+/* Make the component fill the viewport */
+:host {
+  display: block;
+}
+.split-container {
+  display: flex;
+  min-height: 100dvh; /* mobile-safe viewport height */
+}
+
+.left,
+.right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Use Material 3 CSS tokens if available; otherwise fall back to your own or a hex value */
+.left {
+  /* "accent" ≈ Material 3 "secondary" */
+  background-color: var(--mat-sys-color-secondary, var(--app-accent, #ffd740));
+  color: var(--mat-sys-color-on-secondary, #000);
+}
+
+.right {
+  background-color: var(--mat-sys-color-primary, var(--app-primary, #673AB7));
+  color: var(--mat-sys-color-on-primary, #fff);
+}
+
+/* Equal-size buttons */
+.equal-btn {
+  min-width: 120px;  /* adjust as needed */
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+}

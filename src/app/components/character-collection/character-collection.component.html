@@ -1,0 +1,36 @@
+<div class="character-grid">
+  <span class="top-span" *ngIf="characters == [] && !failedToGetCharacters">
+    No character havs been created yet
+  </span>
+  <span class="top-span error" *ngIf="failedToGetCharacters">
+    There has been an issue getting your characters
+  </span>
+  <mat-card class="character-card" *ngFor="let character of characters">
+    <mat-card-header>
+      <mat-card-title>{{ character.name }}</mat-card-title>
+      <mat-card-subtitle>
+        {{ character.characterClass?.name }} • Level {{ character.level }}
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- You can add more stats here if needed -->
+    </mat-card-content>
+
+    <mat-card-actions align="end">
+      <button mat-button color="primary" (click)="viewCharacter(character)">View</button>
+      <button mat-button color="accent" (click)="goToLvlUp(character)">Level Up</button>
+      <button mat-button color="warn" (click)="onDeleteCharacter(character)">Delete</button>
+    </mat-card-actions>
+  </mat-card>
+
+  <!-- Add Character Button -->
+  <mat-card class="character-card add-card" (click)="goToCreateCharacter()">
+    <mat-card-content>
+      <div class="add-character">
+        <mat-icon>add</mat-icon>
+        <span>Add New Character</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

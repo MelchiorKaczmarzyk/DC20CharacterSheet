@@ -1,0 +1,182 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem;
+}
+
+.header {
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.big-input {
+  width: 350px; /* Adjust as needed */
+}
+
+.input-row {
+  display: flex;
+  justify-content: center;
+  gap: 15%;
+  width: 100%;
+  max-width: 720px;
+  padding-top: 4%;
+  padding-bottom: 0%;
+}
+
+.centered-text {
+  text-align: center;
+  font-size: 1rem;
+  color: #555;
+}
+
+.bold-input {
+  font-weight: bold;
+}
+
+.form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 3%;
+}
+.points-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px; /* spacing between fields */
+  width: 94%; /* form width */
+}
+
+.points-field{
+  max-width: 45%;
+}
+
+.points-field-medium{
+  max-width: 35%;
+}
+
+.points-field-small {
+    padding-top: 8%;
+    max-width: 30%;
+}
+
+.points-field input[readonly],
+.remaining-field input[readonly] {
+  cursor: default;
+}
+
+.stats {
+    text-align: center;
+}
+.section-header{
+    text-align: center;
+}
+.vertical-padding{
+    padding-top: 2%;
+    padding-bottom: 0.01%;
+}
+.purple-border{
+    border-color: #673AB7;
+}
+.purple-background{
+    color:gold;
+    background-color:#673AB7;
+}
+.purple{
+    color:#673AB7;
+}
+/* Center text in header and data cells */
+table.mat-mdc-table th.mat-header-cell,
+table.mat-mdc-table td.mat-cell,
+table.mat-mdc-table td.mat-footer-cell {
+  text-align: center;
+  justify-content: center; /* centers flex content horizontally */
+  align-items: center; /* centers flex content vertically */
+}
+/* Style the entire header row */
+.mat-mdc-table .mat-mdc-header-row {
+  background-color: #683ab7c4;
+}
+
+/* Make the header cell text white */
+.mat-mdc-table .mat-mdc-header-cell {
+  color: white;
+}
+.my-table {
+    td{
+        font-size: 18px;
+    }
+
+}
+h1{
+    font-weight: bold;
+}
+
+.attributes-row{
+    display: flex;
+    justify-content: center;
+    gap: 1.5%;
+}
+.attribute-points-field{
+    max-width: 12%;
+}
+.purple-sidenav {
+  background-color: #673AB7;
+}
+
+.purple-sidenav a.mat-list-item {
+  color: white;
+}
+
+.purple-sidenav hr {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+[appSwipe] {
+  touch-action: pan-y; /* allow vertical scroll but keep horizontal swipes for JS */
+}
+mat-sidenav {
+  position: fixed !important;
+}
+
+
+button.icon-button-left,
+button.icon-button-right {
+  display: flex;
+  justify-content: center; /* centers entire .button-content wrapper */
+  align-items: center;
+  padding: 7% 12%;
+  font-size: 20px;
+}
+
+.button-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem; /* equal space between icon and text */
+  margin-left: 20%;
+}
+
+.margin-left {
+    margin-left: 15%;
+}
+
+.margin-right {
+    margin-right: 5%;
+}
+
+.icon-left,
+.icon-right {
+  font-size: 20px;
+}
+.icon-right {
+  margin-left: 13%;
+  overflow: visible;
+  order: 1; /* put after text */
+}
+.icon-left {
+  padding-right: 1%;
+  order: -1; /* put before text (default but explicit) */
+}

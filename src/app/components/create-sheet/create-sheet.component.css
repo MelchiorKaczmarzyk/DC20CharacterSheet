@@ -1,0 +1,335 @@
+/*ATRIBUTES*/
+.form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+ /* full screen height */
+}
+.points-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px; /* spacing between fields */
+  width: 260px; /* form width */
+}
+
+.points-field,
+.remaining-field {
+  width: 60%;
+}
+
+.points-field input[readonly],
+.remaining-field input[readonly] {
+  cursor: default;
+}
+
+.atribute-score{
+    text-align: center;
+    padding-left: 16%;
+}
+.section-header{
+    text-align: center;
+}
+.purple-border{
+    border-color: #673AB7;
+}
+.purple{
+    color:#673AB7;
+}
+
+/*SKILLS*/
+.page-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* two columns of sections */
+  grid-template-rows: repeat(2, 1fr);    /* two rows of sections */
+ 
+  width: 75vw;
+  margin: 0 auto;
+  box-sizing: border-box;
+  gap: 16px; /* spacing between sections */
+  padding: 16px;
+  align-content: center;
+  
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 8px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 6px 0;
+}
+
+.row-label {
+  flex: 1;
+  font-weight: 500;
+}
+
+
+
+.page-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly; /* evenly distribute groups on the screen */
+  /* fit one screen */
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.group {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.group-header {
+  text-align: center;
+  margin-bottom: 8px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.row {
+  
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  
+
+}
+
+.row-label {
+  flex: 1;
+  font-weight: 500;
+  margin-right: auto; /* pushes following elements to the right */
+}
+
+.skills-radio-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.top-inputs {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+
+}
+
+.top-field {
+  flex: 1;
+  
+  text-align: center;
+  width: 60%;
+
+}
+.top-input-field{
+    text-align: center;
+
+}
+.right-top-input-field{
+    text-align: center;
+    padding-top: 10%;
+    padding-left: 20%;
+}
+/*Trades*/
+.trade-button {
+    padding-bottom: 7%;
+}
+.trade-button-left {
+    padding-bottom: 7%;
+    padding-left: 1%;
+}
+.wide-field {
+  flex: 1 1 auto;
+  min-width: 65%; /* or % for responsiveness */
+}
+
+/*Ancestries*/
+.ancestry-name {
+  margin-left: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  padding-top: 2.75%;
+}
+.trait-container {
+  display: flex;
+  flex-direction: column; /* stacks .trait-row and .trait-select-wrapper vertically */
+  margin-bottom: 12px;
+}
+
+.trait-row {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 4px;
+}
+
+.trait-content {
+  flex: 1;
+  margin-left: 8px;
+  line-height: 1.4;
+}
+.trait-select-wrapper {
+  display: flex;
+  justify-content: center; /* centers the dropdown horizontally */
+  margin-top: 8px;
+}
+
+.selection-field {
+  width: 250px; /* adjust to your liking */
+}
+
+.selection-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* centers fields horizontally */
+  gap: 16px;
+  margin-top: 16px;
+}
+
+/*CLASSES*/
+.class-name {
+  font-size: 16px;
+  padding-top: 2.75%;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+.talent-name {
+  font-size: 14px;
+
+}
+
+.talent-section {
+  margin-left: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.subtalents {
+  margin-left: 1rem;
+  margin-top: 0.3rem;
+}
+
+.talent-options {
+  display: flex;
+  flex-direction: column;
+  margin-left: 1rem;
+  margin-top: 0.5rem;
+  gap: 0.5rem; /* ✅ Adds vertical space between options */
+}
+
+.semi-bold {
+    font-weight:500; /* or 600 */
+    text-shadow: 0 0 0.3px currentColor;
+
+}
+
+/*FINISH*/
+/* New style for the main wrapper */
+/* No change to this, it's correct for pushing the final page to the bottom */
+.main-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Updated .final-page to correctly handle its children */
+.final-page {
+  /* This pushes the section to the bottom */
+  margin-top: auto;
+
+  /* Use flexbox to organize its children in a column */
+  display: flex;
+  flex-direction: column;
+
+  /* Crucial: Make this container fill all available vertical space */
+  flex-grow: 1;
+}
+
+/* Updated .finish-button-container to be responsible for the centering */
+.finish-button-container {
+  /* This combination centers content both ways */
+  display: flex;
+  justify-content: center; /* Centers horizontally */
+  align-items: center; /* Centers vertically */
+
+  /* Crucial: This container needs to grow to fill the space below the header */
+  flex-grow: 1;
+}
+
+/* Your other finish button styles */
+.finish-button {
+  /* Set a larger vertical padding to make it taller */
+  padding: 10% 15%; 
+
+  /* Use flexbox to center the content (text) */
+  display: flex;
+  justify-content: center; /* Centers horizontally */
+  align-items: center; /* Centers vertically */
+  font-size: 20px;
+}
+
+.wide-field {
+  flex: 1;
+  max-width: 65%; /* or % for responsiveness */
+}
+.centered-container {
+  display: flex;
+  justify-content: center; /* This centers the child horizontally */
+}
+.error-text {
+ color: red;
+}
+.error-checkbox {
+ color: red;
+}
+.error-field {
+ border-color: red;
+}
+[appSwipe] {
+  touch-action: pan-y; /* allow vertical scroll but keep horizontal swipes for JS */
+}
+mat-sidenav {
+  position: fixed !important;
+}
+.purple-sidenav {
+  background-color: #673AB7;
+}
+
+.purple-sidenav a.mat-list-item {
+  color: white;
+}
+
+.purple-sidenav hr {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/*ARMOR*/
+.radio-container {
+  display: flex;
+  justify-content: center; /* horizontally center */
+
+}
+
+mat-radio-group {
+  display: flex;
+  justify-content: space-evenly; /* space out buttons evenly */
+  width: 250px;                 /* adjust this width to control spacing */
+}
+
