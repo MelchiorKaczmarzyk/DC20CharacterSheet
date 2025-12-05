@@ -6,7 +6,7 @@ export interface IClass {
     armorTraining: string;
     mana: number;
     cantripsKnown: number;
-    spellsKnowm: number;
+    spellsKnown: number;
     stamina: number;
     maneuversKnown: number;
     hp: number;

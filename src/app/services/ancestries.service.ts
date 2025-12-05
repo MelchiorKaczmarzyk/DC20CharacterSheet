@@ -11,7 +11,9 @@ import { switchMap } from 'rxjs';
 export class AncestriesService {
 
   onTraitSelected(model: CreateSheetModel, ancestry: IAncestry, trait: IAncestryTrait) {
-    //add a feature to model.features
+    model.ancestryPointsSpent += trait.cost;
+
+    //to powinien robić service
     model.features.push({
       name: trait.name,
       source: ancestry.name,
@@ -21,12 +23,24 @@ export class AncestriesService {
       costSP: trait.costSP
     });
 
-    //modifies any values of model if selecting that trait impacts displayed values
+    //SKILL EXPERTISE
+    if(trait.name == "Skill Expertise"){
+      if(model.isSkillAdept){
+        this.revertTrait(model, ancestry, trait);
+      }
+    }
 
+    //TRADE EXPERTISE
+    if(trait.name == "Trade Expertise"){
+      if(model.isTradeAdept){
+        this.revertTrait(model, ancestry, trait);
+      }
+    }
   }
 
   revertTrait(model: CreateSheetModel, ancestry: IAncestry, trait: IAncestryTrait) {
-    //removes a feature from model.features by trait.name
+    model.ancestryPointsSpent -= trait.cost;
+
     model.features = model.features.filter(f=>f.name!=trait.name);
     //reverts the changes made to model by selecting a trait. It does that by making opposite changes 
 
@@ -35,19 +49,29 @@ export class AncestriesService {
   recalculateOptions(model: CreateSheetModel, trait: IAncestryTrait){
     //ATTRIBUTE INCREASE
     if(trait.name == "Attribute Increase"){
-      trait.options = model.attributes.filter(a=>a.value<3).map(a=>a.name);
+      trait.options = model.attributes
+      .filter(a=>a.value<3 || a.name==this.previousAttributeIncreaseOption)
+      .map(a=>a.name);
     }
     //SKILL EXPERTISE
-    if(trait.name == "Skill Expertise"){
-      trait.options = model.skills.filter(s=>s.level==1).map(s=>s.name);
+    else if(trait.name == "Skill Expertise"){
+      trait.options = model.skills
+      .filter(s=>s.level==1 || s.name==this.previousSkillExpertiseOption)
+      .map(s=>s.name);
     }
     //ATTRIBUTE DECREASE
-    if(trait.name == "Attribute Decrease"){
-      trait.options = model.attributes.filter(a=>a.value>-2).map(a=>a.name);
+    else if(trait.name == "Attribute Decrease"){
+      trait.options = model.attributes
+      .filter(a=>a.value>-2 || a.name==this.previousAttributeDecreaseOption)
+      .map(a=>a.name);
     }
     //TRADE EXPERTISE
-    if(trait.name == "Trade Expertise"){
-      trait.options = model.trades.filter(t=>t.level==1 && t.name!="").map(t=>t.name);
+    else if(trait.name == "Trade Expertise"){
+      trait.options = model.trades
+      .filter(t=>
+        (t.level==1 && t.name!="") || 
+        (t.name==this.previousTradeExpertiseOption && this.previousTradeExpertiseOption != ""))
+      .map(t=>t.name);
     }
   }
 
@@ -77,6 +101,7 @@ export class AncestriesService {
       const skill = model.skills.find(s=>s.name==option);
       if(skill != undefined){
         skill.level = 2;
+        model.skillForExpertise = skill;
       }
       this.previousSkillExpertiseOption = option;
     }
@@ -121,6 +146,7 @@ export class AncestriesService {
       const skill = model.skills.find(s=>s.name==this.previousSkillExpertiseOption);
       if(skill != undefined){
         skill.level = 1;
+        model.skillForExpertise = undefined;
       }
     }
     //ATTRIBUTE DECREASE

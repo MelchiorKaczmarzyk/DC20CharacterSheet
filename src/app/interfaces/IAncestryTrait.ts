@@ -8,5 +8,7 @@ export interface IAncestryTrait {
     costMP: number,
     hasOptions: boolean,
     options: string[],
-    optionSelected: string
+    optionSelected: string,
+    requirementText : string,
+    requirementTraitName: string
 }

@@ -4,11 +4,11 @@
             "selected": false,
             "name": "Rogue",
             "armorTraining": "Light",
-            "mana": 0,
+            "mana": 6,
             "cantripsKnown": 0,
             "spellsKnown": 0,
             "stamina": 1,
-            "manueversKnown": 4,
+            "maneuversKnown": 4,
             "hp": 9,
             "talents": [
                 {
@@ -53,68 +53,7 @@
                     "costMP": 0,
                     "levelRequirement": 1,
                     "numberOfOptionsToChoose":1,
-                    "options": [
-                        {
-                            "selected": false,
-                            "name": "Awarness Expertise",
-                            "text": "Your Skill Mastery Limit and your Skill Mastery in Awarness increases by 1."
-                        },
-                        {
-                            "selected": false,
-                            "name": "Athletics Expertise",
-                            "text": "Your Skill Mastery Limit and your Skill Mastery in Athlerics increases by 1."
-                        },
-                        {
-                            "selected": false,
-                            "name": "Intimidation Expertise",
-                            "text": "Your Skill Mastery Limit and your Skill Mastery in Intimidation increases by 1."
-                        },
-                        {
-                            "selected": false,
-                            "name": "Acrobatics Expertise",
-                            "text": "Your Skill Mastery Limit and your Skill Mastery in Acrobatics increases by 1."
-                        },
-                        {
-                            "selected": false,
-                            "name": "Trickery Expertise",
-                            "text": "Your Skill Mastery Limit and your Skill Mastery in Trickery increases by 1."
-                        },
-                        {
-                            "selected": false,
-                            "name": "Stealth Expertise",
-                            "text": "Your Skill Mastery Limit and your Skill Mastery in Stealth increases by 1."
-                        },
-                        {
-                            "selected": false,
-                            "name": "Animal Expertise",
-                            "text": "Your Skill Mastery Limit and your Skill Mastery in Animal increases by 1."
-                        },
-                        {
-                            "selected": false,
-                            "name": "Influrnce Expertise",
-                            "text": "Your Skill Mastery Limit and your Skill Mastery in Influrnce increases by 1."
-                        },
-                        {
-                            "selected": false,
-                            "name": "Insight Expertise",
-                            "text": "Your Skill Mastery Limit and your Skill Mastery in Insight increases by 1."
-                        },
-                        {
-                            "selected": false,
-                            "name": "Investigation Expertise",
-                            "text": "Your Skill Mastery Limit and your Skill Mastery in Investigation increases by 1."
-                        },
-                        {
-                            "selected": false,
-                            "name": "Medicine Expertise",
-                            "text": "Your Skill Mastery Limit and your Skill Mastery in Medicine increases by 1."
-                        },
-                        {
-                            "selected": false,
-                            "name": "Survival Expertise",
-                            "text": "Your Skill Mastery Limit and your Skill Mastery in Survival increases by 1."
-                        }
-                    ],
+                    "options": [],
                     "text": "You gain the following benefits:",
                     "subTalents": [
                         {
@@ -123,7 +62,7 @@
                         },
                         {
                             "name": "Skill Expertise",
-                            "text": "Your Skill Mastery Limit and your Skill Mastery in a chosen skill increases by 1, up to Grandmaster (+10). A Skill can only benefit from one increase to its Mastery limit."
+                            "text": "Your Skill Mastery Limit increases by 1, up to Grandmaster (+10). You gain +1 Skill Point."
                         }
                     ]
                 },

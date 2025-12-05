@@ -3,7 +3,7 @@
 <mat-sidenav #sidenav position="end" appSwipe (swipeRight)="closeSidenav(sidenav)" class="purple-sidenav">
           <mat-nav-list>
           @for (s of sections; track s) {
-            <div *ngIf="!((s.display=='Maneuvers' && !isClassMartial)||(s.display=='Spells' && !isClassCaster))">
+            <div *ngIf="!((s.display=='Maneuvers' && !model.isClassMartial)||(s.display=='Spells' && !model.isClassCaster))">
             <a mat-list-item (click)="navigateToSection(s.name)">
               {{s.display}}
             </a>
@@ -319,8 +319,8 @@
     </mat-expansion-panel-header>
 
     <!-- TRAITS LIST -->
-    <div *ngFor="let trait of ancestry.traits" class="trait-container">  <!-- ① NEW wrapper div -->
-  <div class="trait-row">  <!-- ② The row now only holds checkbox + text -->
+    <div *ngFor="let trait of ancestry.traits" class="trait-container">
+  <div class="trait-row">
     <mat-checkbox [(ngModel)]="trait.selected" color="primary"
       (click)="onAncestryTraitChosen(ancestry, trait)">
     </mat-checkbox>
@@ -328,16 +328,16 @@
     <span class="trait-content">
       <strong>({{ trait.cost }}) </strong>
       <strong>{{ trait.name }}:</strong>
+      <i>{{ trait.requirementText }}</i>
       {{ trait.text }}
     </span>
   </div>
 
-  <!-- ③ The select section moved OUTSIDE the .trait-row and into its own container -->
   <div *ngIf="trait.hasOptions && trait.selected"
-       [ngClass]="{'error-look':!model.isAttributeIncreaseCorrect}"
-       class="trait-select-wrapper"> <!-- ④ NEW class for layout -->
+       [ngClass]="{'error-look':!areAncestryTraitOptionsPicked && trait.optionSelected==''}"
+       class="trait-select-wrapper">
     <mat-form-field appearance="outline" class="selection-field">
-      <mat-label [ngClass]="{'error-text':!model.isAttributeIncreaseCorrect}">
+      <mat-label [ngClass]="{'error-text':!areAncestryTraitOptionsPicked && trait.optionSelected==''}">
         {{ trait.name }}
       </mat-label>
       <mat-select 
@@ -355,64 +355,13 @@
   </mat-expansion-panel>
 </mat-accordion>
 <br>
-<div class="selection-section">
-  
-  <!-- 1. Attributes < 3 -->
-  <div [ngClass]="{'error-look':!model.isAttributeIncreaseCorrect}">
-  <mat-form-field appearance="outline" class="selection-field" *ngIf="pickedAttributeIncrease()">
-    <mat-label [ngClass]="{'error-text':!model.isAttributeIncreaseCorrect}">Attribute increase</mat-label>
-    <mat-select (selectionChange)="onAttributeForIncreaseChosen($event.value)">
-      <mat-option *ngFor="let attribute of model.attributesBelow3" [value]="attribute.name">
-        {{ attribute.name }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-  </div>
-
-  <!-- 2. Attributes > -2 -->
-   <div [ngClass]="{'error-look':!model.isAttributeDecreaseCorrect}">
-  <mat-form-field appearance="outline" class="selection-field" *ngIf="pickedAttributeDecrease()">
-    <mat-label [ngClass]="{'error-text':!model.isAttributeDecreaseCorrect}">Attribute decrease</mat-label>
-    <mat-select (selectionChange)="onAttributeForDecreaseChosen($event.value)">
-      <mat-option *ngFor="let attribute of model.attributesAboveMinus2" [value]="attribute.name">
-        {{ attribute.name }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-  </div>
-
-  <!-- 3. Skills with Novice -->
-  <div [ngClass]="{'error-look':!isSkillExpertiseCorrect}">
-  <mat-form-field appearance="outline" class="selection-field" *ngIf="pickedSkillExpertise() && !isSkillAdept()">
-    <mat-label [ngClass]="{'error-text':!isSkillExpertiseCorrect}">Skill expertise</mat-label>
-    <mat-select (selectionChange)="onSkillForExpertiseChosen($event.value)"
-    [ngClass]="{'error-field':!isSkillExpertiseCorrect}">
-      <mat-option *ngFor="let skill of skillsNovice" [value]="skill.name">
-        {{ skill.name }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-  </div>
-
-  <div [ngClass]="{'error-look':!isTradeExpertiseCorrect}">
-  <mat-form-field appearance="outline" class="selection-field" *ngIf="pickedTradeExpertise() && !isTradeAdept()">
-    <mat-label [ngClass]="{'error-text':!isTradeExpertiseCorrect}">Trade expertise</mat-label>
-    <mat-select (selectionChange)="onTradeForExpertiseChosen($event.value)">
-      <mat-option *ngFor="let trade of tradesNovice" [value]="trade.name">
-        {{ trade.name }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-  </div>
-
-</div>
 <!--CLASSES-->
 <div class="page" id="classSection">
 <hr class="purple-border">
 <h2 class="section-header purple">Class</h2>
 <hr class="purple-border">
 <mat-accordion>
-  <mat-expansion-panel *ngFor="let classItem of classes" #panel>
+  <mat-expansion-panel *ngFor="let classItem of model.classes" #panel>
     <!-- 1. Checkbox + Class Name as Header -->
     <mat-expansion-panel-header>
       <div [ngClass]="{'error-look':!isClassSelected}">
@@ -438,7 +387,7 @@
       <div *ngIf="talent.options != []" class="talent-options">
         <div [ngClass]="{'error-look':!areClassOptionsSelected}">
         <mat-checkbox color="primary" *ngFor="let option of talent.options" [(ngModel)]="option.selected" 
-          (click)="onTalentOptionChosen(talent, option)">
+          (click)="onTalentOptionChosen(classItem, talent, option)">
           <strong><em>{{ option.name }}: </em></strong>  {{ option.text | prependSpace}}
         </mat-checkbox>
         </div>
@@ -447,19 +396,163 @@
   </mat-expansion-panel>
 </mat-accordion>
 </div>
-<!--SPELLS - coming up in 0.10-->
-<div class="page" id="spellsSection" *ngIf="currentClass != undefined && currentClass.mana>0">
+<!--Spells-->
+  <!--Cantrips-->
+<div class="page" id="cantripsSection" *ngIf="model.currentClass != undefined && model.currentClass.mana>0">
+<hr class="purple-border">
+<h2 class="section-header purple">Cantrips</h2>
+<hr class="purple-border">
+  <br>
+  <div class="form-container">
+  <form class="points-form">
+    <mat-form-field appearance="outline" class="remaining-field"
+    [ngClass]="{'error-look':!areCantripsSelected}">
+      <mat-label [ngClass]="{'error-look':!areCantripsSelected}">Available Cantrips</mat-label>
+      <input matInput type="number" [readonly]="true" 
+        name="remainingCantripPoints" class="section-header" [(ngModel)]="model.cantripPoints"/>
+    </mat-form-field>
+    </form>
+  </div>
+
+  <mat-accordion>
+  <mat-expansion-panel *ngFor="let cantrip of model.cantrips" #panel>
+
+    <mat-expansion-panel-header>
+      <div>
+      <mat-checkbox [(ngModel)]="cantrip.selected" (click)="onCantripChosen(cantrip, panel)">
+      </mat-checkbox>
+      </div>
+      <span class="class-name">{{ cantrip.name }}</span>
+    </mat-expansion-panel-header>
+    <p><strong>Source:</strong> {{ cantrip.sources.join(', ') }}</p>
+    <p><strong>School:</strong> {{ cantrip.schools.join(', ') }}</p>
+    <p><strong>Tags:</strong> {{ cantrip.tags.join(', ') }}</p>
+    <p><strong>Cost:</strong> {{cantrip.costAP}}AP</p>
+    <p><strong>Range:</strong> {{ cantrip.range }} spaces</p>
+    <p><strong>Duration:</strong> {{ cantrip.duration }} {{cantrip.durationUnit}} <ng-container *ngIf="cantrip.isSustained">(Sustained)</ng-container></p>
+    <p>{{cantrip.description}}</p>
+    <p><strong>Enhancements:</strong></p>
+    <div *ngFor="let enhancement of cantrip.enhancements" class="talent-section">
+        <p>
+          <strong class="talent-name" *ngIf="enhancement.costAP > 0 && enhancement.costMP > 0">
+            {{ enhancement.name }} ({{enhancement.costAP}}AP + {{enhancement.costMP}}MP
+            <ng-container *ngIf="enhancement.repeteable">, Repeatable</ng-container>):
+          </strong> 
+          <strong class="talent-name" *ngIf="enhancement.costAP > 0 && enhancement.costMP <= 0">
+            {{ enhancement.name }} ({{enhancement.costAP}}AP
+            <ng-container *ngIf="enhancement.repeteable">, Repeatable</ng-container>):
+          </strong> 
+          <strong class="talent-name" *ngIf="enhancement.costAP <= 0 && enhancement.costMP > 0">
+            {{ enhancement.name }} ({{enhancement.costMP}}MP
+            <ng-container *ngIf="enhancement.repeteable">, Repeatable</ng-container>):
+          </strong> 
+            {{ enhancement.description | prependSpace}}
+        </p>
+    </div>
+  </mat-expansion-panel>
+</mat-accordion>
+</div>
+  <!--Actual spells-->
+<div class="page" id="spellsSection" *ngIf="model.currentClass != undefined && model.currentClass.mana>0">
 <hr class="purple-border">
 <h2 class="section-header purple">Spells</h2>
 <hr class="purple-border">
-  Coming soon in 0.10...
+  <br>
+  <div class="form-container">
+  <form class="points-form">
+    <mat-form-field appearance="outline" class="remaining-field"
+    [ngClass]="{'error-look':!areSpellsSelected}">
+      <mat-label [ngClass]="{'error-look':!areSpellsSelected}">Available Spells</mat-label>
+      <input matInput type="number" [readonly]="true" 
+        name="remainingSpellPoints" class="section-header" [(ngModel)]="model.spellPoints"/>
+    </mat-form-field>
+    </form>
+  </div>
+
+  <mat-accordion>
+  <mat-expansion-panel *ngFor="let spell of model.spells" #panel>
+
+    <mat-expansion-panel-header>
+      <div>
+      <mat-checkbox [(ngModel)]="spell.selected" (click)="onCantripChosen(spell, panel)">
+      </mat-checkbox>
+      </div>
+      <span class="class-name">{{ spell.name }}</span>
+    </mat-expansion-panel-header>
+    <p><strong>Source:</strong> {{ spell.sources.join(', ') }}</p>
+    <p><strong>School:</strong> {{ spell.schools.join(', ') }}</p>
+    <p><strong>Tags:</strong> {{ spell.tags.join(', ') }}</p>
+    <p><strong>Cost:</strong> {{spell.costAP}}AP, {{spell.costMP}}MP</p>
+    <p><strong>Range:</strong> {{ spell.range }} spaces</p>
+    <p><strong>Duration:</strong> {{ spell.duration }} {{spell.durationUnit}} <ng-container *ngIf="spell.isSustained">(Sustained)</ng-container></p>
+    <p>{{spell.description}}</p>
+    <p><strong>Enhancements:</strong></p>
+    <div *ngFor="let enhancement of spell.enhancements" class="talent-section">
+        <p>
+          <strong class="talent-name" *ngIf="enhancement.costAP > 0 && enhancement.costMP > 0">
+            {{ enhancement.name }} ({{enhancement.costAP}}AP + {{enhancement.costMP}}MP:
+            <ng-container *ngIf="enhancement.repeteable">, Repeatable</ng-container>):
+          </strong> 
+          <strong class="talent-name" *ngIf="enhancement.costAP > 0 && enhancement.costMP <= 0">
+            {{ enhancement.name }} ({{enhancement.costAP}}AP
+            <ng-container *ngIf="enhancement.repeteable">, Repeatable</ng-container>):
+          </strong> 
+          <strong class="talent-name" *ngIf="enhancement.costAP <= 0 && enhancement.costMP > 0">
+            {{ enhancement.name }} ({{enhancement.costMP}}MP
+            <ng-container *ngIf="enhancement.repeteable">, Repeatable</ng-container>):
+          </strong> 
+            {{ enhancement.description | prependSpace}}
+        </p>
+    </div>
+  </mat-expansion-panel>
+</mat-accordion>
 </div>
-<!--MANEUVERS - coming up in 0.10-->
-<div class="page" id="maneuversSection" *ngIf="currentClass != undefined && currentClass.stamina>0">
+
+<!--Maneuvers-->
+<div class="page" id="maneuversSection" *ngIf="model.currentClass != undefined && model.currentClass.stamina>0">
 <hr class="purple-border">
-<h2 class="section-header purple">Manuevers</h2>
+<h2 class="section-header purple">Maneuvers</h2>
 <hr class="purple-border">
-  Coming soon in 0.10...
+  <br>
+  <div class="form-container">
+  <form class="points-form">
+    <mat-form-field appearance="outline" class="remaining-field"
+    [ngClass]="{'error-look':!areManeuversSelected}">
+      <mat-label [ngClass]="{'error-look':!areManeuversSelected}">Available Maneuvers</mat-label>
+      <input matInput type="number" [readonly]="true" 
+        name="remainingManeuverPoints" class="section-header" [(ngModel)]="model.maneuverPoints"/>
+    </mat-form-field>
+    </form>
+  </div>
+
+  <mat-accordion>
+  <mat-expansion-panel *ngFor="let maneuver of model.maneuvers" #panel>
+
+    <mat-expansion-panel-header>
+      <div>
+      <mat-checkbox [(ngModel)]="maneuver.selected" (click)="onManeuverChosen(maneuver, panel)">
+      </mat-checkbox>
+      </div>
+      <span class="class-name">{{ maneuver.name }}</span>
+    </mat-expansion-panel-header>
+    <p>{{maneuver.description}}</p>
+    <p><strong>Enhancements:</strong></p>
+    <div *ngFor="let enhancement of maneuver.enhancements" class="talent-section">
+        <p>
+          <strong class="talent-name" *ngIf="enhancement.costAP > 0 && enhancement.costSP > 0">
+            {{ enhancement.name }} ({{enhancement.costAP}}AP + {{enhancement.costSP}}SP):
+          </strong> 
+          <strong class="talent-name" *ngIf="enhancement.costAP > 0 && enhancement.costSP <= 0">
+            {{ enhancement.name }} ({{enhancement.costAP}}AP):
+          </strong> 
+          <strong class="talent-name" *ngIf="enhancement.costAP <= 0 && enhancement.costSP > 0">
+            {{ enhancement.name }} ({{enhancement.costSP}}SP):
+          </strong> 
+            {{ enhancement.description | prependSpace}}
+        </p>
+    </div>
+  </mat-expansion-panel>
+</mat-accordion>
 </div>
 
 <!--Armor-->
@@ -472,61 +565,78 @@
     <mat-form-field appearance="outline" class="top-field">
       <mat-label>Precision Defense</mat-label>
       <input matInput name="precisionDefense" class="top-input-field" type="number" 
-      style="font-size: 35px;" [readonly]="true" [(ngModel)]="character.precisionDefense"/>
+      style="font-size: 35px;" [readonly]="true" [(ngModel)]="model.precisionDefense"/>
     </mat-form-field>
         <mat-form-field appearance="outline" class="top-field">
       <mat-label>Area Defense</mat-label>
       <input matInput name="areaDefense" class="top-input-field" type="number" 
-      style="font-size: 35px;" [readonly]="true" [(ngModel)]="character.areaDefense"/>
+      style="font-size: 35px;" [readonly]="true" [(ngModel)]="model.areaDefense"/>
     </mat-form-field>
   </div>
   </div>
-  </div>
-  <!--CHANGE THE LOGIC HERE TO BE ANALAGOUS AS FOR THE CLASSES-->
+</div>
   <mat-accordion>
   <mat-expansion-panel #panel>
     <mat-expansion-panel-header>
-      <mat-checkbox [(ngModel)]="isWearingArmor" (click)="onArmorDon(panel)">
+      <mat-checkbox [(ngModel)]="model.isWearingArmor" (click)="onArmorDon(panel)">
       </mat-checkbox>
       <span class="class-name">Armor</span>
     </mat-expansion-panel-header>
-    <!--visible only if you're wearing armor-->
 
-  <!---->
   <div class="form-container">
     <form class="points-form">
-      <mat-form-field appearance="outline" class="remaining-field">
-      <mat-label>Armor Points</mat-label>
+      <mat-form-field appearance="outline" class="remaining-field"
+        [ngClass]="{'error-look':!areArmorPropertiesSelected}">
+      <mat-label [ngClass]="{'error-look':!areArmorPropertiesSelected}">
+        Armor Points
+      </mat-label>
       <input matInput type="number" [readonly]="true" 
-        name="remainingArmorPoints" class="section-header" [(ngModel)]="armorPoints"/>
+        name="remainingArmorPoints" class="section-header" [(ngModel)]="model.armorPoints"/>
     </mat-form-field>
     </form>
   </div>
 
 <div class="radio-container">
-  <mat-radio-group [(ngModel)]="selectedArmorType">
+  <mat-radio-group [(ngModel)]="model.selectedArmorType">
     <mat-radio-button color="primary" value="Light">Light</mat-radio-button>
     <mat-radio-button color="primary" value="Heavy"
-      *ngIf="currentClass == undefined || currentClass.armorTraining == 'Heavy'">
+      *ngIf="model.currentClass == undefined || model.currentClass.armorTraining == 'Heavy'">
       Heavy
     </mat-radio-button>
     <mat-radio-button color="primary" value="Heavy" disabled
-      *ngIf="currentClass != undefined && currentClass.armorTraining != 'Heavy'">
+      *ngIf="model.currentClass != undefined && model.currentClass.armorTraining != 'Heavy'">
       Heavy
     </mat-radio-button>
   </mat-radio-group>
 </div>
 
 <div class="subtalents">
-        <p *ngFor="let p of legalArmorProierties">
+  <div *ngFor="let p of legalArmorProperties">
+        <p>
           <em class="semi-bold">({{p.cost}}) {{ p.name }} {{p.helperText}}:</em> 
-          <mat-checkbox color="primary" *ngFor="let o of p.options" [(ngModel)]="o.selected" (click)="onArmorOptionClicked(o,p.options,p)">
-
+          <mat-checkbox preventDefaultCheck color="primary" *ngFor="let o of p.options"
+          [(ngModel)]="o.selected" (click)="onArmorOptionClicked(o,p.options,p)">
           </mat-checkbox>
         </p>
+        
+      <div *ngIf="isArmorOptionSelected(p.name) && !p.selection.selectionsEmpty"
+        [ngClass]="{'error-look':!areArmorPropertyOptionsSelected}"
+        class="trait-select-wrapper">
+      <mat-form-field appearance="outline" class="selection-field">
+      <mat-label [ngClass]="{'error-text':!areArmorPropertyOptionsSelected}">
+        {{ p.name }}
+      </mat-label>
+      <mat-select (selectionChange)="onArmorSelectionChange(p.selection, $event.value)">
+        <mat-option *ngFor="let selection of p.selection.selections" [value]="selection">
+          {{ selection }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    </div>
+  </div>
+
 </div>
-  <!---->
-  </mat-expansion-panel>
+</mat-expansion-panel>
 </mat-accordion>
   <mat-accordion>
   <mat-expansion-panel #panel>
@@ -535,48 +645,64 @@
       </mat-checkbox>
       <span class="class-name">Shield</span>
     </mat-expansion-panel-header>
-      <!--visible only if you're using a shield-->
-  <!---->
+
+    <!---->
   <div class="form-container">
     <form class="points-form">
-      <mat-form-field appearance="outline" class="remaining-field">
-      <mat-label>Shield Points</mat-label>
+      <mat-form-field appearance="outline" class="remaining-field"
+        [ngClass]="{'error-look':!areShieldPropertiesSelected}">
+      <mat-label [ngClass]="{'error-text':!areShieldPropertiesSelected}">
+        Shield Points
+      </mat-label>
       <input matInput type="number" [readonly]="true" 
-        name="remainingShieldPoints" class="section-header" [(ngModel)]="shieldPoints"/>
+        name="remainingShieldPoints" class="section-header" [(ngModel)]="model.shieldPoints"/>
     </mat-form-field>
     </form>
   </div>
 
 <div class="radio-container">
-  <mat-radio-group [(ngModel)]="selectedShieldType">
+  <mat-radio-group [(ngModel)]="model.selectedShieldType">
     <mat-radio-button color="primary" value="Light">Light</mat-radio-button>
     <mat-radio-button color="primary" value="Heavy"
-      *ngIf="currentClass == undefined || currentClass.armorTraining == 'Heavy'">
+      *ngIf="model.currentClass == undefined || model.currentClass.armorTraining == 'Heavy'">
       Heavy
     </mat-radio-button>
     <mat-radio-button color="primary" value="Heavy" disabled
-      *ngIf="currentClass != undefined && currentClass.armorTraining != 'Heavy'">
+      *ngIf="model.currentClass != undefined && model.currentClass.armorTraining != 'Heavy'">
       Heavy
     </mat-radio-button>
   </mat-radio-group>
 </div>
 
 <div class="subtalents">
-        <p *ngFor="let p of legalShieldProierties">
+  <div *ngFor="let p of legalShieldProperties">
+        <p>
           <em class="semi-bold">({{p.cost}}) {{ p.name }} {{p.helperText}}:</em> 
-          <mat-checkbox color="primary" *ngFor="let o of p.options" [(ngModel)]="o.selected" (click)="onShieldOptionClicked(o,p.options,p)">
-
+          <mat-checkbox preventDefaultCheck color="primary" *ngFor="let o of p.options" 
+          [(ngModel)]="o.selected" (click)="onShieldOptionClicked(o,p.options,p)">
           </mat-checkbox>
         </p>
+        
+      <div *ngIf="isShieldOptionSelected(p.name) && !p.selection.selectionsEmpty"
+        [ngClass]="{'error-look':!areShieldPropertyOptionsSelected}"
+        class="trait-select-wrapper">
+      <mat-form-field appearance="outline" class="selection-field">
+      <mat-label [ngClass]="{'error-text':!areShieldPropertyOptionsSelected}">
+        {{ p.name }}
+      </mat-label>
+      <mat-select (selectionChange)="onArmorSelectionChange(p.selection, $event.value)">
+        <mat-option *ngFor="let selection of p.selection.selections" [value]="selection">
+          {{ selection }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    </div> 
+    </div>
 </div>
-    </mat-expansion-panel>
-  </mat-accordion>
 
-  <!--
-    Options to choose depending on armor type AND shield options to choose depending on type of shield.
-    the armor options should be visible only after checking a check box with armor, and the same for shield
-    and guard weapon 
-   -->
+</mat-expansion-panel>
+</mat-accordion>
+
 <!--FINISH-->
 <div class="main-container">
 <div class="page-finish" id="finishSection">

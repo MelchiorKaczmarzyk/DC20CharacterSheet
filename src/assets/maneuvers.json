@@ -1,0 +1,25 @@
+{
+    "maneuvers": [
+        {
+            "selected":false,
+            "name":"Swift Strike",
+            "description":"You move a number of Spaces up to your Speed and make a Melee Martial Attack against the PD of 1 target within your Melee Range at any point durting this movement. On hit the target takes the damage of your Weapon or Unarmed Strike.",
+            "costAP":1,
+            "costSP":1,
+            "enhancements":[
+                {
+                    "name":"Disengage",
+                    "description":"This movement doesn't provoke Opportunity Attacks",
+                    "costAP":0,
+                    "costSP":1
+                },
+                {
+                    "name":"Subsequent Strike",
+                    "description":"You gain additional movement equal to halve your Speed and you can target an additional creature using the same Attack Check",
+                    "costAP": 1,
+                    "costSP": 1
+                }
+            ]
+        }
+    ]
+}

@@ -1,12 +1,17 @@
 {
     "shieldProperties": [
         {
-            "name":"Precision Defense increase",
+            "name":"Precision Defense Increase",
             "helperText":"",
             "shieldOrArmor":"shield",
             "forLight":true,
             "forHeavy":true,
             "cost":1,
+            "selection":{
+                "selectionName":"",
+                "selectionsEmpty": true,
+                "selections":[]
+            },
             "options": [
                 {
                     "cost":1,
@@ -21,12 +26,17 @@
             ]
         },
         {
-            "name":"Area Defense increase",
+            "name":"Area Defense Increase",
             "helperText":"",
             "shieldOrArmor":"shield",
             "forLight":true,
             "forHeavy":true,
             "cost":1,
+            "selection":{
+                "selectionName":"",
+                "selectionsEmpty": true,
+                "selections":[]
+            },
             "options": [
                 {
                     "cost":1,
@@ -41,12 +51,23 @@
             ]
         },
         {
-            "name":"Elemental damage reduction",
+            "name":"Elemental Damage Reduction",
             "helperText":"",
             "shieldOrArmor":"shield",
             "forLight":true,
             "forHeavy":true,
             "cost":2,
+            "selection":{
+                "selectionName":"",
+                "selectionsEmpty": false,
+                "selections":[
+                    "Cold",
+                    "Corrosion",
+                    "Fire",
+                    "Lightining",
+                    "Poison"
+                    ]
+            },
             "options": [
                 {
                     "cost":2,
@@ -62,6 +83,11 @@
             "forLight":true,
             "forHeavy":false,
             "cost":1,
+            "selection":{
+                "selectionName":"",
+                "selectionsEmpty": true,
+                "selections":[]
+            },
             "options": [
                 {
                     "cost":1,
@@ -78,6 +104,11 @@
             "forLight":true,
             "forHeavy":false,
             "cost":1,
+            "selection":{
+                "selectionName":"",
+                "selectionsEmpty": true,
+                "selections":[]
+            },
             "options": [
                 {
                     "cost":1,
@@ -88,12 +119,21 @@
             
         },
         {
-            "name":"Physical damage reduction",
+            "name":"Physical Damage Reduction",
             "helperText":"",
             "shieldOrArmor":"shield",
             "forLight":false,
             "forHeavy":true,
             "cost":2,
+            "selection":{
+                "selectionName":"",
+                "selectionsEmpty": false,
+                "selections":[
+                    "Bludgeoning",
+                    "Piercing",
+                    "Slashing"
+                ]
+            },
             "options": [
                 {
                     "cost":2,
@@ -109,6 +149,11 @@
             "forLight":false,
             "forHeavy":true,
             "cost":1,
+            "selection":{
+                "selectionName":"",
+                "selectionsEmpty": true,
+                "selections":[]
+            },
             "options": [
                 {
                     "cost":1,
@@ -125,6 +170,11 @@
             "forLight":false,
             "forHeavy":true,
             "cost":-1,
+            "selection":{
+                "selectionName":"",
+                "selectionsEmpty": true,
+                "selections":[]
+            },
             "options": [
                 {
                     "cost":-1,
@@ -140,6 +190,11 @@
             "forLight":false,
             "forHeavy":true,
             "cost":-1,
+            "selection":{
+                "selectionName":"",
+                "selectionsEmpty": true,
+                "selections":[]
+            },
             "options": [
                 {
                     "cost":-1,

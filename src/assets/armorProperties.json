@@ -1,52 +1,77 @@
 {
     "armorProperties": [
         {
-            "name":"Precision Defense increase",
+            "name":"Precision Defense Increase",
             "helperText":"",
             "shieldOrArmor":"armor",
             "forLight":true,
             "forHeavy":true,
             "cost":1,
+            "selection":{
+                "selectionName":"",
+                "selectionsEmpty": true,
+                "selections":[]
+            },
             "options": [
                 {
                     "cost":1,
                     "selected":false,
-                    "level":1
+                    "level":1,
+                    "selection":{}
                 },
                 {
                     "cost":1,
                     "selected":false,
-                    "level":2
+                    "level":2,
+                    "selection":{}
                 }
             ]
         },
         {
-            "name":"Area Defense increase",
+            "name":"Area Defense Increase",
             "helperText":"",
             "shieldOrArmor":"armor",
             "forLight":true,
             "forHeavy":true,
             "cost":1,
+            "selection":{
+                "selectionName":"",
+                "selectionsEmpty": true,
+                "selections":[]
+            },
             "options": [
                 {
                     "cost":1,
                     "selected":false,
-                    "level":1
+                    "level":1,
+                    "selection":{}
                 },
                 {
                     "cost":1,
                     "selected":false,
-                    "level":2
+                    "level":2,
+                    "selection":{}
                 }
             ]
         },
         {
-            "name":"Elemental damage reduction",
+            "name":"Elemental Damage Reduction",
             "helperText":"",
             "shieldOrArmor":"armor",
             "forLight":true,
             "forHeavy":true,
             "cost":2,
+            "selection":{
+                "selectionName":"",
+                "selectionsEmpty": false,
+                "selections":[
+                    "Cold",
+                    "Corrosion",
+                    "Fire",
+                    "Lightining",
+                    "Poison"
+                    ]
+                },
             "options": [
                 {
                     "cost":2,
@@ -56,12 +81,21 @@
             ]
         },
         {
-            "name":"Physical damage reduction",
+            "name":"Physical Damage Reduction",
             "helperText":"",
             "shieldOrArmor":"armor",
             "forLight":false,
             "forHeavy":true,
             "cost":2,
+            "selection":{
+                "selectionName":"",
+                "selectionsEmpty": false,
+                "selections":[
+                    "Bludgeoning",
+                    "Piercing",
+                    "Slashing"
+                ]
+            },
             "options": [
                 {
                     "cost":2,
@@ -77,11 +111,17 @@
             "forLight":false,
             "forHeavy":true,
             "cost":-1,
+            "selection":{
+                "selectionsEmpty": true,
+                "selectionName":"",
+                "selections":[]
+            },
             "options": [
                 {
                     "cost":-1,
                     "selected":false,
-                    "level":1
+                    "level":1,
+                    "selection":{}
                 }
             ]
         },
@@ -92,11 +132,17 @@
             "forLight":false,
             "forHeavy":true,
             "cost":-1,
+            "selection":{
+                "selectionName":"",
+                "selectionsEmpty": true,
+                "selections":[]
+            },
             "options": [
                 {
                     "cost":-1,
                     "selected":false,
-                    "level":1
+                    "level":1,
+                    "selection":{}
                 }
             ]
         }

@@ -31,66 +31,18 @@ export class CharacterCreatedService {
     }],
     ancestries: [],
     skills: [
-    {
-      name: "Awarness",
-      attribute: "Prime",
-      level: 0
-    },
-    {
-      name: "Athletics",
-      attribute: "Might",
-      level: 0
-    },
-    {
-      name: "Intimidation",
-      attribute: "Might",
-      level: 0
-    },
-    {
-      name: "Acrobatics",
-      attribute: "Agility",
-      level: 0
-    },
-    {
-      name: "Trickery",
-      attribute: "Agility",
-      level: 0
-    },
-    {
-      name: "Stealth",
-      attribute: "Agility",
-      level: 0
-    },
-    {
-      name: "Animal",
-      attribute: "Charisma",
-      level: 0
-    },
-    {
-      name: "Influence",
-      attribute: "Charisma",
-      level: 0
-    },
-    {
-      name: "Insight",
-      attribute: "Charisma",
-      level: 0
-    },
-    {
-      name: "Investigation",
-      attribute: "Intelligence",
-      level: 0
-    },
-    {
-      name: "Medicine",
-      attribute: "Intelligence",
-      level: 0
-    },
-    {
-      name: "Survival",
-      attribute: "Intelligence",
-      level: 0
-    }
+        { name: "Awarness", attribute: "Prime", level: 0, levelCap: 1 },
+        { name: "Athletics", attribute: "Might", level: 0, levelCap: 1  },
+        { name: "Intimidation", attribute: "Might", level: 0, levelCap: 1  },
+        { name: "Acrobatics", attribute: "Agility", level: 0, levelCap: 1  },
+        { name: "Trickery", attribute: "Agility", level: 0, levelCap: 1  },
+        { name: "Stealth", attribute: "Agility", level: 0, levelCap: 1  },
+        { name: "Animal", attribute: "Charisma", level: 0, levelCap: 1  },
+        { name: "Influence", attribute: "Charisma", level: 0, levelCap: 1  },
+        { name: "Insight", attribute: "Charisma", level: 0, levelCap: 1  },
+        { name: "Investigation", attribute: "Intelligence", level: 0, levelCap: 1  },
+        { name: "Medicine", attribute: "Intelligence", level: 0, levelCap: 1  },
+        { name: "Survival", attribute: "Intelligence", level: 0, levelCap: 1  },
     ],
     trades: [
         {name: '', level: 0}, 

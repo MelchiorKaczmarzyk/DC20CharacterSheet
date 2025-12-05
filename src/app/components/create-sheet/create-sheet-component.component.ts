@@ -17,7 +17,7 @@ import {MatSelectModule} from '@angular/material/select';
 import { ISkill } from '../../interfaces/ISkill';
 import { ITrade } from '../../interfaces/ITrade';
 import { IClass } from '../../interfaces/IClass';
-import { PrependSpace } from '../../pipes/prependSpacePipe';
+import { PrependSpace } from '../../pipes/prependSpace.pipe';
 import { ITalent } from '../../interfaces/ITalent';
 import { ICharacter } from '../../interfaces/ICharacter';
 import { CharacterCreatedService } from '../../services/character-created.service';
@@ -25,18 +25,23 @@ import { ExtraOptions, Router, RouterModule } from '@angular/router';
 import { ITalentOption } from '../../interfaces/ITalentOption';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatToolbarModule} from '@angular/material/toolbar';
-import { SwipeDirective } from '../../directives/swipe-directive';
+import { SwipeDirective } from '../../directives/swipe.directive';
 import {MatListModule} from '@angular/material/list';
 import { IFeature } from '../../interfaces/IFeature';
 import { CharacterClassesService } from '../../services/character-classes.service';
-import { ArmorPropertiesService } from '../../services/armor-properties.service';
+import { ArmorService } from '../../services/armor.service';
 import { SkillsService } from '../../services/skills.service';
 import { Subscription, switchMap } from 'rxjs';
 import { CreateSheetModelService } from '../../services/create-sheet-model.service';
-import { AncestriesService } from '../../services/ancestries-service.service';
-
-
-
+import { AncestriesService } from '../../services/ancestries.service';
+import { IArmorProperty } from '../../interfaces/IArmorProperty';
+import { IArmorPropertySelection } from '../../interfaces/IArmorPropertySelection';
+import { IArmorPropertyOption } from '../../interfaces/IArmorPropertyOption';
+import { PreventDefaultCheckDirective } from '../../directives/preventDefaultCheck.directive';
+import { IManeuver } from '../../interfaces/IManeuver';
+import { ManeuverService } from '../../services/maneuver.service';
+import { SpellService } from '../../services/spell.service';
+import { ISpell } from '../../interfaces/ISpell';
 
 @Component({
   selector: 'app-create-sheet',
@@ -44,40 +49,32 @@ import { AncestriesService } from '../../services/ancestries-service.service';
   imports: [MatButtonModule, MatRadioModule, MatInputModule, MatFormFieldModule, MatIconModule,
     MatCheckboxModule, MatExpansionModule, MatOption, MatSelectModule, FormsModule, MatSidenavModule,
     MatToolbarModule, MatListModule,
-    CommonModule, HttpClientModule, PrependSpace, SwipeDirective],
+    CommonModule, HttpClientModule, PrependSpace, SwipeDirective, PreventDefaultCheckDirective],
   templateUrl: './create-sheet.component.html',
-  styleUrls: ['./create-sheet.component.css']
+  styleUrls: ['./create-sheet.component.css'],
 })
 
 export class CreateSheetComponent implements OnInit, OnDestroy {
 
   constructor(private http: HttpClient, private router: Router, 
     private characterCreated: CharacterCreatedService, private classService: CharacterClassesService,
-    private armorService: ArmorPropertiesService, private skillsService: SkillsService,
+    private armorService: ArmorService, private skillsService: SkillsService,
     private ancestryService: AncestriesService,
-    private dataModel: CreateSheetModelService){
+    private dataModel: CreateSheetModelService,
+    private maneuverService: ManeuverService,
+    private spellService: SpellService){
     }
   model = this.dataModel.data;
   //ATRIBUTES
-
-  //  ! TO BE REMOVED - functionality moved to the service !
-
   increaseAttribute(attribute: IAttribute){
     if(attribute.value < attribute.ceiling && this.model.attributePoints > 0){
       attribute.value += 1;
-      this.handleDefenses(attribute,'+');
-      this.handleHP(attribute,'+');
-      this.manageAttributesForAncestries();
-      //reverting the element to its normal style after it was marked as being in wrong state
-      this.validateAttributes();
+      this.areAttributePointsSpent = true;
     }
   }
   decreaseAttribute(attribute: IAttribute){
     if(attribute.value > attribute.floor && this.model.attributePoints < 13){
       attribute.value -= 1;
-      this.handleDefenses(attribute,'-');
-      this.handleHP(attribute,'-');
-      this.manageAttributesForAncestries();
       if(attribute.name == "Intelligence"){
         this.model.skillPointSpent = 0;
         this.model.tradePointsSpent = 0;
@@ -89,59 +86,12 @@ export class CreateSheetComponent implements OnInit, OnDestroy {
         }
       }
     }
-  }
-  handleDefenses(attribute : IAttribute, operation: string) {
-      if(attribute.name == 'Might' || attribute.name == 'Charisma')
-      {
-        if(operation == '+')
-          this.model.precisionDefense += 1;
-        if(operation == '-')
-          this.model.precisionDefense -= 1;
-      }
-      else if(attribute.name == 'Agility' || attribute.name == 'Intelligence')
-      {
-        if(operation == '+')
-          this.model.precisionDefense += 1;
-        if(operation == '-')
-          this.model.precisionDefense -= 1;
-      }
-  }
-  handleHP(attribute : IAttribute, operation:string){
-    if(attribute.name == "Might"){
-        if(operation == '+')
-          this.model.precisionDefense += 1;
-        if(operation == '-')
-          this.model.precisionDefense -= 1;
-    }
+    this.areAttributePointsSpent = true;
   }
   //SKILLS
   subSkills = new Subscription();
-  
-  hasTrait(traitName : string): boolean{
-    for(let ancestry of this.model.ancestries){
-      for(let trait of ancestry.traits){
-        if(trait.name==traitName){
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-    
-  get isAdept() : boolean{
-    if (this.model.skills.some(s => s.level == 2) || this.character.trades.some(t => t.level == 2))
-      {
-        return true;
-      }
-      else
-        return false;
-  }
-
   getSkill(name: string) : ISkill{
-    return this.model.skills.find(s=>s.name==name) ?? {name:"",attribute:",",level:0,}
-  }
-  getSkillAdept() : ISkill{
-    return this.model.skills.find(s=>s.level==2) ?? {name:"",attribute:",",level:0,};
+    return this.model.skills.find(s=>s.name==name) ?? {name:"",attribute:",",level:0, levelCap:0}
   }
   
   onNoviceClicked(skillName: string, event: MouseEvent){
@@ -162,51 +112,56 @@ export class CreateSheetComponent implements OnInit, OnDestroy {
       this.model.skillPointSpent -= 1;
       skill.level = 0;
     }
-    else if(isLevel2){
+    else if(isLevel2 && skill==this.model.skillWhereBoughtAdept){
       this.model.skillPointSpent -= 2;
       skill.level = 1;
     }
-    this.recalculateNoviceSkills();
+    else{
+      event.preventDefault();
+    }
+    this.areSkillPointsSpent = true;
   }
   onAdeptClicked(skillName: string, event: MouseEvent){
     const skill: ISkill = this.getSkill(skillName);
     const isLevel0 = skill.level == 0;
     const isLevel1 = skill.level == 1;
     const isLevel2 = skill.level == 2;
-    if(isLevel0 && this.model.skillPoints >= 3){
-      this.model.skillPointSpent += 3;
+
+    if(isLevel0 && this.model.skillPoints >= 3 && this.model.skillAdeptNumber < this.model.skillAdeptNumberMax){
+      this.model.skillPointSpent += this.model.skillAdeptCost;
       skill.level = 2;
     }
     else if(isLevel0 && !(this.model.skillPoints >= 3)){
       skill.level = 0;
     }
-    else if(isLevel1 && this.model.skillPoints >= 2){
-      this.model.skillPointSpent += 2;
+    else if(isLevel1 && this.model.skillPoints >= 2 && this.model.skillAdeptNumber < this.model.skillAdeptNumberMax){
+      this.model.skillPointSpent += this.model.skillAdeptCost-1;
       skill.level = 2;
     }
     else if(isLevel1 && !(this.model.skillPoints >= 2)){
       skill.level = 1;
     }
-    else if(isLevel2 /*AND IF YOU PAID FOR IT*/){
-      this.model.skillPointSpent -= 3;
+    else if(isLevel2 && !this.model.skillForExpertise){
+      this.model.skillPointSpent -= this.model.skillAdeptCost;
       skill.level = 0;
     }
-    this.recalculateNoviceSkills();
+    else{
+      event.preventDefault();
+    }
+    this.areSkillPointsSpent = true;
   }
 
   getTrade(name: string) : ITrade{
     return this.model.trades.find(t=>t.name==name) ?? {name:"",level:0};
   }
-  getTradeAdept() : ITrade{
-    return this.model.trades.find(t=>t.level==2) ?? {name:"",level:0,};
-  }
+
   onNoviceTradeClicked(tradeName: string, event: MouseEvent){
     const trade: ITrade = this.getTrade(tradeName);
     const enoughTradePoints = this.model.skillPoints > 0;
     const isLevel0 = trade.level == 0;
     const isLevel1 = trade.level == 1;
     const isLevel2 = trade.level == 2;
-    if(isLevel0 && enoughTradePoints){
+    if(isLevel0 && enoughTradePoints && trade.name != ""){
       this.model.tradePointsSpent += 1;
       trade.level = 1;
     }
@@ -217,47 +172,19 @@ export class CreateSheetComponent implements OnInit, OnDestroy {
       this.model.tradePointsSpent -= 1;
       trade.level = 0;
     }
-    else if(isLevel2){
-      this.model.tradePointsSpent -= 2;
-      trade.level = 1;
+    else {
+      event.preventDefault();
     }
-    this.recalculateNoviceTrades();
+    this.areTradePointsSpent;
   }
   onAdeptTradeClicked(tradeName: string, event: MouseEvent){
-    const trade: ITrade = this.getTrade(tradeName);
-    const enoughTradePoints = this.model.skillPoints > 1;
-    const isLevel0 = trade.level == 0;
-    const isLevel1 = trade.level == 1;
-    const isLevel2 = trade.level == 2;
-    if(isLevel0 && this.model.skillPoints >= 3){
-      this.model.tradePointsSpent += 3;
-      trade.level = 2;
-    }
-    else if(isLevel0 && !(this.model.tradePoints >= 3)){
-      trade.level = 0;
-    }
-    else if(isLevel1 && this.model.tradePoints >= 2){
-      this.model.tradePointsSpent += 2;
-      trade.level = 2;
-    }
-    else if(isLevel1 && !(this.model.tradePoints >= 2)){
-      trade.level = 1;
-    }
-    else if(isLevel2 /*AND IF YOU PAID FOR IT*/){
-      this.model.tradePointsSpent -= 3;
-      trade.level = 0;
-    }
-    this.recalculateNoviceTrades();
+    event.preventDefault();
   }
 
 //ANCESTRIES
-/*
-So far ancestry traits which require other ancestry traits (like beastborn or dragonborn have for example)
-are not handled at all. The IAncestryTrait interface will need to be expanded to include requirement field.
-*/
   onAncestryChosen(ancestry: IAncestry, event: Event, panel: any) {
   let copyOfAncestrySelected = ancestry.selected;
-  if (this.getAncestriesChosenNumber() > 2 && !this.model.allowLimitlessAncestries) {
+  if (this.model.ancestriesChosenNumber > 2 && !this.model.allowLimitlessAncestries) {
     ancestry.selected = false;
   } 
   else if (copyOfAncestrySelected) {
@@ -265,6 +192,7 @@ are not handled at all. The IAncestryTrait interface will need to be expanded to
     let zeroCostTrait = ancestry.traits.find(t => t.cost == 0);
     if (zeroCostTrait && this.allow0CostSelection(ancestry)) {
       zeroCostTrait.selected = true;
+      this.ancestryService.onTraitSelected(this.model,ancestry,zeroCostTrait);
     }
     //reverting the element to its normal style after it was marked as being in wrong state
     this.validateAncestries();
@@ -273,89 +201,14 @@ are not handled at all. The IAncestryTrait interface will need to be expanded to
     panel.open();
     for (let trait of ancestry.traits) {
       if (trait.selected) {
-        this.revertAncestryTraitChanges(trait, 'ancestry');
-      }
+        this.ancestryService.revertTrait(this.model,ancestry,trait);
+        }
       trait.selected = false;
-    }
-  }
-  this.recalculateAncestryPoints();
-}
-  isTradeAdept() : boolean {
-    if(this.character.trades.some(t => t.level == 2)){
-      return true;
-    }
-    else
-      return false;
-  }
-  isSkillAdept() : boolean {
-    if(this.character.skills.some(s => s.level == 2)){
-      return true;
-    }
-    else
-      return false;
-  }
-  pickedSkillExpertise() : boolean {
-    for(let a of this.model.ancestries){
-      /*
-      To jest trochę spaghetti code, te trady powinny mieć jakieś tagi i to powinno sprawdzać, czy
-      dany trade ma "zwiększa mastery limit" tag czy coś, a nie tak chamsko po nazwie
-      */
-      let condition = a.traits.some(t => t.name=='Skill Expertise' && t.selected);
-      if(condition)
-        return true;
-    }
-    return false
-  }
-  pickedTradeExpertise() : boolean {
-    for(let a of this.model.ancestries){
-      /*
-      To jest trochę spaghetti code, te trady powinny mieć jakieś tagi i to powinno sprawdzać, czy
-      dany trade ma "zwiększa mastery limit" tag czy coś, a nie tak chamsko po nazwie
-      */
-      let condition = a.traits.some(t => t.name=='Trade Expertise' && t.selected);
-      if(condition)
-        return true;
-    }
-    return false
-  }
-  pickedAttributeIncrease() : boolean {
-      for(let a of this.model.ancestries){
-      /*
-      To jest trochę spaghetti code, te trady powinny mieć jakieś tagi i to powinno sprawdzać, czy
-      dany trade ma "zwiększa mastery limit" tag czy coś, a nie tak chamsko po nazwie
-      */
-      let condition = a.traits.some(t => t.name=='Attribute Increase' && t.selected);
-      if(condition)
-        return true;
-    }
-    return false
-  }
-  pickedAttributeDecrease() : boolean {
-      for(let a of this.model.ancestries){
-      /*
-      To jest trochę spaghetti code, te trady powinny mieć jakieś tagi i to powinno sprawdzać, czy
-      dany trade ma "zwiększa mastery limit" tag czy coś, a nie tak chamsko po nazwie
-      */
-      let condition = a.traits.some(t => t.name=='Attribute Decrease' && t.selected);
-      if(condition)
-        return true;
-    }
-    return false
-  }
-  getAncestriesChosenNumber() : number {
-    let result = 0;
-    result = this.model.ancestries.filter(a=>a.selected).length;
-    return result;
-  }
-  recalculateAncestryPoints(){
-    let pointsSpent = 0;
-    for(let ancestry of this.model.ancestries){
-      for(let trait of ancestry.traits){
-        pointsSpent = (trait.selected)? pointsSpent+trait.cost : pointsSpent;
       }
     }
-    this.model.ancestryPointsSpent = pointsSpent;
+    this.areAncestriesChosen = true;
   }
+  
   allow0CostSelection(ancestry : IAncestry) : boolean {
     let ancestries = this.model.ancestries.filter(a=>a.name!=ancestry.name);
     for(let ancestry of ancestries){
@@ -364,8 +217,6 @@ are not handled at all. The IAncestryTrait interface will need to be expanded to
     }
     return true;
   }
-  
-
   onAncestryTraitChosen(ancestry :IAncestry, trait : IAncestryTrait){
     const cost = trait.cost;
     const enoughAncestryPoints = this.model.ancestryPoints >= cost;
@@ -376,7 +227,6 @@ are not handled at all. The IAncestryTrait interface will need to be expanded to
       trait.selected = false;
     }
     else if(trait.selected && enoughAncestryPoints){
-      this.model.ancestryPointsSpent += cost;
       this.ancestryService.onTraitSelected(this.model, ancestry, trait)
       this.ancestryService.recalculateOptions(this.model, trait);
     }
@@ -384,9 +234,9 @@ are not handled at all. The IAncestryTrait interface will need to be expanded to
       trait.selected = false;
     }
     else if(!trait.selected){
-      this.model.ancestryPointsSpent -= cost;
       this.ancestryService.revertTrait(this.model, ancestry, trait)
     }
+    this.areAncestryPointsSpent = true;
     
   }
   onOpenedChange(trait: IAncestryTrait){
@@ -394,381 +244,280 @@ are not handled at all. The IAncestryTrait interface will need to be expanded to
   }
   onTraitOptionChosen(trait : IAncestryTrait, option: string){
     this.ancestryService.onOptionSelected(this.model, trait, option);
-  }
-//This method will need to be modified to properly handled other traits with options
-/*
-  onAncestryTraitChosen(ancestry :IAncestry, trait : IAncestryTrait) {
-    if(trait.cost == 0 && ancestry.selected){
-      trait.selected = true;
-    }
-    else if(!ancestry.selected){
-      trait.selected = false;
-    }
-    else if(trait.selected && 
-      (this.model.ancestryPoints < trait.cost || 
-      !ancestry.selected ||
-      (trait.name == "Trade Expertise" && this.isTradeAdept()) ||
-      (trait.name == "Skill Expertise" && this.isSkillAdept()))) {
-      trait.selected = false;
-    }
-    //kliknięcie checkboxa ustawia trait.selected = true zanim ta metoda się w ogóle zacznie wykonywać
-    else if(trait.selected){
-      //reverting the element to its normal style after it was marked as being in wrong state
-      this.validateAncestryTraits();
-    }
-    else if(!trait.selected){
-      //undo changes made by picking those traits when they are unselected
-      this.revertAncestryTraitChanges(trait, 'trait');
-    }
-    this.recalculateAncestryPoints();
-  }
-  */
-
-  /*THIS WHOLE SECTION IS ABOUT ANCESTRY TRAITS THAT REQUIRE THE USER TO CHOOSE FURTHER OPTIONS*/
-  /*
-  Each trait that makes it so options need to be picked must be individually
-  checked for. This method may need to be expanded by for example ancestry traits
-  that allow to choose a spell or damage type for some effect
-  */
-  revertAncestryTraitChanges(trait: IAncestryTrait, source: string){
-    if((source=='ancestry' && trait.selected) || (source=='trait' && !trait.selected)){
-      if(trait.name == 'Skill Expertise'){
-      let skillExpert = this.model.skills.find(s => s.level == 2);
-        if(skillExpert != undefined){
-          const adeptKey = `is${skillExpert.name}Adept` as keyof this;
-          this[adeptKey] = false as any;
-          skillExpert.level = 1;
-          this.skillForExpertise_name = '';
-        }
-      }
-      if(trait.name == 'Trade Expertise'){
-        let tradeExpert = this.model.trades.find(t => t.level == 2);
-        if(tradeExpert != undefined){
-          tradeExpert.level = 1;
-          this.tradeForExpertise_name = '';
-        }
-      }
-      if(trait.name == 'Attribute Increase'){
-        let attributeChosen = this.model.attributes.find(a => a.floor > -2);
-        if(attributeChosen != undefined){
-          attributeChosen.floor -= 1;
-          attributeChosen.value -= 1;
-          this.model.attributeForIncrease_name = '';
-        }
-      }
-      if(trait.name == 'Attribute Decrease'){
-        let attributeChosen = this.model.attributes.find(a => a.ceiling < 3);
-        if(attributeChosen != undefined){
-          attributeChosen.ceiling += 1;
-          attributeChosen.value += 1;
-          this.model.attributeForDecrease_name = '';
-        }
-      }
-    }
+    this.areAncestryTraitOptionsPicked = true;
   }
 
-  //Attribute Increase and Attribute Decrease
-  
-  getAttributesBelow3() : IAttribute[] {
-    let attributesBelow3 = this.model.attributes.filter(a=>a.value<3);
-    if(this.getAttributeIncreased().value == 3) {
-      attributesBelow3.push(this.getAttributeIncreased());
-    }
-    return attributesBelow3;
-  }
-  getAttributesAboveMinus2() : IAttribute[]{
-    let attributesAboveMinus2 = this.model.attributes.filter(a=>a.value>-2);
-    if((this.getAttributeDecreased().value == -2)){
-      attributesAboveMinus2.push(this.getAttributeDecreased());
-    }
-    return attributesAboveMinus2;
-  }
-  getAttributeIncreased() : IAttribute {
-    return this.model.attributes.find(a=>a.floor>-2) ?? {name:"",value:0,floor:-1,ceiling:3};
-  }
-  getAttributeDecreased() : IAttribute {
-    return this.model.attributes.find(a=>a.floor>-2) ?? {name:"",value:0,floor:-2,ceiling:2};
-  }
-  
-  manageAttributesForAncestries(){
-    this.model.attributesAboveMinus2 = this.getAttributesAboveMinus2();
-    this.model.attributesBelow3 = this.getAttributesBelow3();
-  }
-  
-  onAttributeForIncreaseChosen(attributeName : string) {
-    this.manageAttributesForAncestries();
-    let attributeChosen = this.model.attributes.find(a => a.name == attributeName);
-    if(this.model.attributeForIncrease_name != '') {
-      let previoussAttribute = this.model.attributes.find(a=>a.name == this.model.attributeForIncrease_name);
-      if(previoussAttribute != undefined){
-        previoussAttribute.floor -= 1;
-        previoussAttribute.value -= 1;
-      }
-    }
-    if(attributeChosen != undefined){
-      attributeChosen.value += 1;
-      attributeChosen.floor += 1;
-    }
-    this.model.attributeForIncrease_name = attributeName;
-    //reverting the element to its normal style after it was marked as being in wrong state
-    this.validateAncestryTraitOptions();
-  }
-  onAttributeForDecreaseChosen(attributeName : string) {
-    let attributeChosen = this.model.attributes.find(a => a.name == attributeName);
-    if(this.model.attributeForDecrease_name != ''){
-      let previoussAttribute = this.model.attributes.find(a=>a.name == this.model.attributeForDecrease_name);
-      if(previoussAttribute != undefined){
-        previoussAttribute.ceiling += 1;
-        previoussAttribute.value += 1;
-      }
-    }
-    if(attributeChosen != undefined){
-        attributeChosen.value -= 1;
-        attributeChosen.floor -= 1;
-    }
-    this.model.attributeForDecrease_name = attributeName;
-    //reverting the element to its normal style after it was marked as being in wrong state
-    this.validateAncestryTraitOptions();
-  }
-  //Trade Expertise
-  isTradeExpertiseCorrect : boolean = true;
-  tradesNovice : ITrade[] = [];
-  tradeForExpertise_name: string = ''; //option that has been chosen bedore, so they can be reversed
-  recalculateNoviceTrades() {
-    let noviceTrades = this.model.trades.filter(t=>t.name != "" && t.level == 1);
-    this.tradesNovice = noviceTrades;
-  }
-  onTradeForExpertiseChosen(tradeName : string) {
-    let tradeChosen = this.model.trades.find(t => t.name == tradeName);
-    if(this.tradeForExpertise_name != ''){
-      let previousTrade = this.model.trades.find(t => t.name == this.tradeForExpertise_name)
-      if(previousTrade != undefined) {
-          previousTrade.level = 1;
-      }
-    }
-    if(tradeChosen != undefined) {
-      tradeChosen.level = 2;
-    }
-    this.tradeForExpertise_name = tradeName;
-    this.validateAncestryTraitOptions();
-  }
-  //Skill Expertise
-  isSkillExpertiseCorrect : boolean = true;
-  skillsNovice : ISkill[] = [];
-  skillForExpertise_name: string = '';
-  recalculateNoviceSkills() {
-    let noviceSkills = this.model.skills.filter(s=>s.level == 1);
-    this.skillsNovice = noviceSkills;
-  }
-  onSkillForExpertiseChosen(skillName : string) {
-    let skillChosen = this.model.skills.find(t => t.name == skillName);
-    if(this.skillForExpertise_name != ''){
-      let previousSkill = this.model.skills.find(t => t.name == this.skillForExpertise_name)
-      if(previousSkill != undefined) {
-          previousSkill.level = 1;
-      }
-    }
-    if(skillChosen != undefined) {
-      skillChosen.level = 2;
-    }
-    this.skillForExpertise_name = skillName;
-    this.validateAncestryTraitOptions();
-  }
-  
   //CLASS
-  classes: IClass[] = [];
-  alreadySelectedClass: IClass | null = null;
-  get currentClass() {
-    return this.classes.find(c => c.selected)
-  }
-  get isClassMartial() : boolean{
-    if(this.currentClass != undefined && this.currentClass.stamina > 0){
-      return true;
-    }
-    else return false;
-  }
-  get isClassCaster() : boolean{
-    if(this.currentClass != undefined && this.currentClass.mana > 0){
-      return true;
-    }
-    else return false;
-  }
-
-  //Proper handling of specific changes picking each class makes to the character sheet
-  onClassChosen(chosenClass: IClass, panel: any) {
-    //ensure that up to one class can be selected
-    if(this.alreadySelectedClass != null){
-      this.alreadySelectedClass.selected = false;
-    }
+  onClassChosen(classChosen: IClass, panel: any){
     //ensure the proper behaviour of the dropdown panel
-    if(chosenClass.selected){
+    if(classChosen.selected){
       //for some reason the condition for closing appear to be backwards
       panel.close();
-      this.alreadySelectedClass = chosenClass;
-      this.character.characterClass = chosenClass;
+      this.model.currentClass = classChosen;
+      this.classService.onClassSelected(this.model, classChosen);
+      if(this.model.previousClass != undefined)
+        this.classService.revertClass(this.model, this.model.previousClass);
+      this.model.previousClass = classChosen;
     }
-    else if (!chosenClass.selected) {
+    else if (!classChosen.selected) {
       //for some reason the condition for closing appear to be backwards
       panel.open();
-      this.alreadySelectedClass = null;
+      this.model.currentClass = undefined;
+      this.model.previousClass = undefined;
+      this.classService.revertClass(this.model, classChosen);
     }
+    this.resetArmorOptions();
+    this.resetShieldOptins();
+    this.resetManeuvers();
     //reverting the element to its normal style after it was marked as being in wrong state
-    this.validateClass();
+    this.isClassSelected = true;
   }
-  /*
-    Proper handling of specific changes picking each individual option makes to the character sheet and
-    allowing correct number of options to pick for each individual trait
-  */
-  onTalentOptionChosen(talent: ITalent, option: ITalentOption) {
+ 
+  onTalentOptionChosen(c: IClass, talent: ITalent, option: ITalentOption) {
     //does not allow the user to choose more options than specified in the talent.numberOfOptionsToChoose
     if(talent.numberOfOptionsToChoose == talent.options.filter(o=>o.selected).length){
       option.selected = false;
     }
+    if(option.selected)
+    {
+      this.classService.onClassTalentOptionSelected(this.model, c, talent, option);
+    }
+    else {
+      this.classService.revertClassTalentOptionSelected(this.model, c, talent, option)
+    }
     //reverting the element to its normal style after it was marked as being in wrong state
-    this.validateClassOptions();
+    this.areClassOptionsSelected = true;
+  }
+
+  //MANEUVERS
+  resetManeuvers(){
+    for(let m of this.model.maneuvers){
+      if(m.selected == true){
+        this.maneuverService.reverManeuverSelection(this.model, m);
+        m.selected = false;
+      }
+    }
+    this.areManeuversSelected = true;
+  }
+  onManeuverChosen(maneuver : IManeuver, panel:any){
+    //ensure the proper behaviour of the dropdown panel
+    if(maneuver.selected){
+      //for some reason the condition for closing appear to be backwards
+      panel.close();
+      this.maneuverService.onManeuverSelected(this.model, maneuver);
+    }
+    else if (!maneuver.selected) {
+      //for some reason the condition for closing appear to be backwards
+      panel.open();
+      this.maneuverService.reverManeuverSelection(this.model, maneuver);
+    }
+    this.areManeuversSelected = true;
+  }
+
+  resetSpells(){
+    for(let s of this.model.spells){
+      if(s.selected == true){
+        this.spellService.revertSpellSelection(this.model, s);
+        s.selected = false;
+      }
+    }
+    for(let c of this.model.cantrips){
+      if(c.selected == true){
+        this.spellService.revertCantripSelection(this.model, c);
+        c.selected = false;
+      }
+    }
+    this.areCantripsSelected = true;
+  }
+  onCantripChosen(cantrip : ISpell, panel:any){
+    //ensure the proper behaviour of the dropdown panel
+    if(cantrip.selected){
+      //for some reason the condition for closing appear to be backwards
+      panel.close();
+      this.spellService.onCantripSelected(this.model, cantrip);
+    }
+    else if (!cantrip.selected) {
+      //for some reason the condition for closing appear to be backwards
+      panel.open();
+      this.spellService.revertCantripSelection(this.model, cantrip);
+    }
+    this.areManeuversSelected = true;
+  }
+  onSpellChosen(spell : ISpell, panel:any){
+    //ensure the proper behaviour of the dropdown panel
+    if(spell.selected){
+      //for some reason the condition for closing appear to be backwards
+      panel.close();
+      this.spellService.onSpellSelected(this.model, spell);
+    }
+    else if (!spell.selected) {
+      //for some reason the condition for closing appear to be backwards
+      panel.open();
+      this.spellService.revertSpellSelection(this.model, spell);
+    }
+    this.areManeuversSelected = true;
   }
 
   //ARMOR
-  armorProperties : any[] = [];
-  shieldProperties : any[] = [];
-  shieldPoints : number = 2;
-  armorPoints : number = 2;
-  isWearingArmor: boolean = false;
+  resetArmorOptions(){
+    this.model.isWearingArmor = false;
+    this.model.selectedArmorType = "Light";
+    for(let property of this.model.armorProperties){
+      for(let option of property.options){
+        if(option.selected){
+          this.armorService.revertArmorChosen(this.model,property,option, "armor");
+          option.selected = false;
+        }
+      }
+    }
+    this.areArmorPropertiesSelected = true;
+    this.areArmorPropertyOptionsSelected = true;
+  }
+  resetShieldOptins(){
+    this.model.isWearingShield = false;
+    this.model.selectedArmorType = "Light";
+    for(let property of this.model.shieldProperties){
+      for(let option of property.options){
+        if(option.selected){
+        this.armorService.revertArmorChosen(this.model,property,option,'shield');
+        option.selected = false;
+        }
+      }
+    }
+    this.areShieldPropertiesSelected = true;
+    this.areShieldPropertyOptionsSelected = true;
+  }
+  
+  isArmorOptionSelected(name : string) : boolean{
+    for(let ap of this.model.armorProperties){
+      let result = ap.options.find(o => ap.name==name && o.selected);
+      if(result != undefined){
+        return true;
+      }
+    }
+    return false;
+  }
+  isShieldOptionSelected(name : string){
+    for(let ap of this.model.shieldProperties){
+      let result = ap.options.find(o => ap.name==name && o.selected);
+      if(result != undefined){
+        return true;
+      }
+    }
+    return false;
+  }
+  onArmorSelectionChange(selection : IArmorPropertySelection, eventValue : string){
+    this.armorService.onArmorSelectionChosen(this.model, selection, eventValue);
+    this.areArmorPropertiesSelected = true;
+    this.areArmorPropertyOptionsSelected = true;
+  }
   onArmorDon(panel:any){
+    this.areArmorPropertiesSelected = true;
+    this.areArmorPropertyOptionsSelected = true;
     //ensure the proper behaviour of the dropdown panel
-    if(this.isWearingArmor){
+    if(this.model.isWearingArmor){
       //for some reason the condition for closing appear to be backwards
       panel.close();
     }
-    else if (!this.isWearingArmor) {
+    else if (!this.model.isWearingArmor) {
       //for some reason the condition for closing appear to be backwards
       panel.open();
+      this.resetArmorOptions();
     }
-        //class needs to be chosen first
-    if(this.currentClass == undefined){
-      this.isWearingArmor = false;
+    //class needs to be chosen first
+    if(this.model.currentClass == undefined){
+      this.model.isWearingArmor = false;
+      this.resetArmorOptions();
     }
+    this.areArmorPropertiesSelected = true;
+    this.areArmorPropertyOptionsSelected = true;
   }
   isWearingShield : boolean = false
   onShieldDon(panel:any){
+    this.areShieldPropertiesSelected = true;
+    this.areShieldPropertyOptionsSelected = true;
     //ensure the proper behaviour of the dropdown panel
-    if(this.isWearingShield){
+    if(this.model.isWearingShield){
       //for some reason the condition for closing appear to be backwards
       panel.close();
     }
-    else if (!this.isWearingShield) {
+    else if (!this.model.isWearingShield) {
       //for some reason the condition for closing appear to be backwards
       panel.open();
+      this.resetShieldOptins();
     }
-    if(this.currentClass == undefined){
-      this.isWearingShield = false;
+    if(this.model.currentClass == undefined){
+      this.model.isWearingShield = false;
+      this.resetShieldOptins();
     }
+    this.areShieldPropertiesSelected = true;
+    this.areShieldPropertyOptionsSelected = true;
   }
-
-  selectedArmorType : string = "Light";
-  get legalArmorProierties():any[] {
-    if(this.selectedArmorType == 'Light'){
-      return this.armorProperties.filter(p=>p.forLight);
+  get legalArmorProperties():any[] {
+    if(this.model.selectedArmorType == 'Light'){
+      return this.model.armorProperties.filter(p=>p.forLight);
     }
-    if(this.selectedArmorType == 'Heavy'){
-      return this.armorProperties.filter(p=>p.forHeavy);
+    if(this.model.selectedArmorType == 'Heavy'){
+      return this.model.armorProperties.filter(p=>p.forHeavy);
     }
     else return [];
   }
-  selectedShieldType : string = 'Light'
-  get legalShieldProierties():any[] {
-    if(this.selectedShieldType == 'Light'){
-      return this.shieldProperties.filter(p=>p.forLight);
+  get legalShieldProperties():any[] {
+    if(this.model.selectedShieldType == 'Light'){
+      return this.model.shieldProperties.filter(p=>p.forLight);
     }
-    if(this.selectedShieldType == 'Heavy'){
-      return this.shieldProperties.filter(p=>p.forHeavy);
+    if(this.model.selectedShieldType == 'Heavy'){
+      return this.model.shieldProperties.filter(p=>p.forHeavy);
     }
     else return [];
   }
-  onArmorOptionClicked(armorOption : any, options : any[], armorProperty:any){
-    //can't check anything unless wearing armor
-    if(!this.isWearingArmor){
-      armorOption.selected=false;
+  onArmorOptionClicked(armorOption:IArmorPropertyOption, options:IArmorPropertyOption[], 
+    armorProperty:IArmorProperty){
+    let isSelected = armorOption.selected == true;
+    let enoughPoints = armorOption.cost <= this.model.armorPoints;
+    let previousLevelIsChecked = (armorOption.level > 1 && options[armorOption.level-2].selected) ||
+      armorOption.level == 1;
+    let isWearingArmor = this.model.isWearingArmor;
+    
+    if(!isSelected && enoughPoints && previousLevelIsChecked && isWearingArmor){
+      armorOption.selected = true;
+      this.armorService.onArmorOptionChosen(this.model, armorProperty, armorOption, 'armor');
     }
-    //can't check the second checkbox if the first one is not checked
-    else if(armorOption.selected && armorOption.level > 1 
-      && !options[armorOption.level-2].selected){
+    else {
+      if(isSelected){
+        this.armorService.revertArmorChosen(this.model, armorProperty, armorOption, 'armor');
+      }
       armorOption.selected = false;
     }
-    //can't uncheck the first checkbox if the second one is checked
-    else if(!armorOption.selected && armorOption.level<options.length 
-      && options[armorOption.level].selected){
-      armorOption.selected = true;
-    }
-    //handle spending of armor points once it was made sure that the box can be checked
-    else if(armorOption.selected && (armorOption.cost < 0 || this.armorPoints >= armorOption.cost)){
-      this.armorPoints -= armorOption.cost;
-      //this.armorService.onSelect(this.character, armorProperty);
-    }
-    else if(!armorOption.selected){
-      this.armorPoints += armorOption.cost;
-      //this.armorService.revert(this.character, armorProperty);
-    }
+    this.areArmorPropertyOptionsSelected = true;
   }
-  onShieldOptionClicked(shieldOption : any, options : any[], shieldProperty: any) {
-  //can check anything only if wearing shield
-    if(!this.isWearingShield){
-      shieldOption.selected=false;
+  onShieldOptionClicked(shieldOption:IArmorPropertyOption, options:IArmorPropertyOption[], 
+    shieldProperty:IArmorProperty, ) {
+    let isSelected = shieldOption.selected == true;
+    let enoughPoints = shieldOption.cost <= this.model.shieldPoints;
+    let previousLevelIsChecked = (shieldOption.level > 1 && options[shieldOption.level-2].selected) ||
+      shieldOption.level == 1;
+    let isWearingArmor = this.model.isWearingArmor;
+    
+    if(!isSelected && enoughPoints && previousLevelIsChecked && isWearingArmor){
+      shieldOption.selected = true;
+      this.armorService.onArmorOptionChosen(this.model, shieldProperty, shieldOption, 'shield');
     }
-    //can't check the second checkbox if the first one is not checked
-    else if(shieldOption.selected && shieldOption.level > 1 
-      && !options[shieldOption.level-2].selected){
+    else {
+      if(isSelected){
+        this.armorService.revertArmorChosen(this.model, shieldProperty, shieldOption, 'shield');
+      }
       shieldOption.selected = false;
     }
-    //can't uncheck the first checkbox if the second one is checked
-    else if(!shieldOption.selected && shieldOption.level<options.length 
-      && options[shieldOption.level].selected){
-      shieldOption.selected = true;
-    }
-    //handle spending of armor points once it was made sure that the box can be checked
-    else if(shieldOption.selected && (shieldOption.cost < 0 || this.shieldPoints >= shieldOption.cost)){
-      this.shieldPoints -= shieldOption.cost;
-      //this.armorService.onSelect(this.character, shieldProperty);
-    }
-    else if(!shieldOption.selected){
-      this.shieldPoints += shieldOption.cost;
-      //this.armorService.revert(this.character, shieldProperty);
-    }
+    this.areShieldPropertyOptionsSelected = true;
   }
 
-  get hp() {
-    let hp = 0;
-    let characterClass = this.currentClass;
-    let mightScore = this.character.attributes.find(a => a.name == 'Might')?.value;
-    if(characterClass != undefined && mightScore != undefined) {
-      hp = characterClass.hp + mightScore;
-    }
-    return hp;
-  }
-
-  features: IFeature[] = [];
   onFinishClicked() {
-    //find chosen ancestries
-    /*
-    let ancestriesChosen = this.ancestriesAll.filter(a=>a.selected);
-    let ancestriesCopy : IAncestry[] = []; 
-    ancestriesChosen.forEach(a => ancestriesCopy.push(Object.assign({},a)));
-    for(let ancestry of ancestriesCopy){
-      ancestry.traits = ancestry.traits.filter(t=>t.selected);
-    }
-    
-    if(this.validateFields(ancestriesChosen))
-    {
-      if(this.currentClass != undefined) {
-      */
-        //this.character.ancestries = this.getAncestriesSelectedOptions();
-        //this.characterCreated.character = this.character;
-        this.router.navigate(['/app/viewCharacter']);
-        /*
+    if(this.validateFields()){
+      //TUTAJ ZRÓB FEATURY I PODODAWAJ JE DO OBECNEJ POSTACI
+      this.router.navigate(['/app/viewCharacter']);
     }
   }
-  */
-}
 
   isNameChosen : boolean = true;
   areAttributePointsSpent : boolean = true;
@@ -779,187 +528,245 @@ are not handled at all. The IAncestryTrait interface will need to be expanded to
   areAncestryTraitOptionsPicked : boolean = true;
   isClassSelected : boolean = true;
   areClassOptionsSelected : boolean = true;
+  areManeuversSelected : boolean = true;
+  areCantripsSelected : boolean = true;
+  areSpellsSelected : boolean = true;
+  areArmorPropertiesSelected : boolean = true;
+  areArmorPropertyOptionsSelected : boolean = true;
+  areShieldPropertiesSelected : boolean = true;
+  areShieldPropertyOptionsSelected : boolean = true;
+  navigationPoint : string = '';
 
-  //marks fields' state as wrong if the conditions are met
-  validateFields(ancestries : IAncestry[]) : boolean {
-    //id of the error section to navigate to
-    let navigationPoint : string = '';
-    //check if name is selected
-    if(this.character.name == ''){
-      this.isNameChosen = false;
-      navigationPoint = 'finishSection';
-    }
-    //check if class was selected
-    if(this.currentClass == undefined){
-      this.isClassSelected = false;
-      navigationPoint = 'classSection';
-    }
-    //check if class options were selected
-    let talentsWithOptions = this.currentClass?.talents.filter(t=>
-      t.numberOfOptionsToChoose>0);
-    if(talentsWithOptions != undefined){
-      for(let talent of talentsWithOptions){
-        let numberOfChosen = talent.options.filter(o=>o.selected).length;
-        if(numberOfChosen != talent.numberOfOptionsToChoose){
-          this.areClassOptionsSelected = false;
-          break;
-        }
-      }
-      if(!this.areClassOptionsSelected){
-        navigationPoint = 'classSection';
-      }
-    }
-    //check if ancestries were chosen
-    if(ancestries.length == 0){
-      this.areAncestriesChosen = false;
-      navigationPoint = 'ancestriesSection';
-    }
-    //check if ancestry points were spent
-    if(this.model.ancestryPoints  != 0){
-      this.areAncestryPointsSpent = false;
-      navigationPoint = 'ancestriesSection';
-    }
-    //check if ancestry trait options were picked
-    let ancestryOptionIsWrong : boolean = false;
-    for(let a of ancestries){
-      for(let t of a.traits){
-        if(t.name == 'Attribute Increase' && this.model.attributeForIncrease_name == ''){
-          this.model.isAttributeIncreaseCorrect = false;
-          ancestryOptionIsWrong = true;
-          break;
-        }
-        if(t.name == 'Attribute Decrease' && this.model.attributeForDecrease_name == ''){
-          this.model.isAttributeDecreaseCorrect = false;
-          ancestryOptionIsWrong = true;
-          break;
-        }
-        if(t.name == 'Skill Expertise' && this.skillForExpertise_name == ''){
-          this.isSkillExpertiseCorrect = false;
-          ancestryOptionIsWrong = true;
-          break;
-        }
-        if(t.name == 'Trade Expertise' && this.tradeForExpertise_name == ''){
-          this.isTradeExpertiseCorrect = false;
-          ancestryOptionIsWrong = true;
-          break;
-        }
-      }
-    }
-    if(ancestryOptionIsWrong)
-    {
-      navigationPoint = 'ancestriesSection';
-    }
-    //check if trade points were spent
-    if(this.model.tradePoints != 0){
-      this.areTradePointsSpent = false;
-      navigationPoint = 'tradesSection';
-    }
-    //check if skill points were spent
-    if(this.model.skillPoints != 0){
-      this.areSkillPointsSpent = false;
-      navigationPoint = 'skillsSection';
-    }
-    //check if attribute points were spent
-    if(this.model.attributePoints != 0){
-      this.areAttributePointsSpent = false;
-      navigationPoint = 'attributesSection';
-    }
-    //może metoda jakaś jak ta sprawdzająca skille...
-    if(this.areAttributePointsSpent && this.areSkillPointsSpent && this.areTradePointsSpent &&
-        this.areAncestriesChosen && this.areAncestryPointsSpent && this.model.isAttributeDecreaseCorrect &&
-        this.model.isAttributeIncreaseCorrect && this.isSkillExpertiseCorrect && this.isTradeExpertiseCorrect &&
-        this.isClassSelected && this.areClassOptionsSelected) {
+  validateFields() : boolean {
+    this.validateName();
+    this.validateArmorOptions();
+    this.validateArmorOptionSelections();
+    this.validateShieldOptions();
+    this.validateShieldOptionSelections();
+    this.validateClass();
+    this.validateClassOptions();
+    this.validateAncestries();
+    this.validateAncestryTraits(); 
+    this.validateAncestryTraitOptions(); 
+    this.validateTrades();
+    this.validateSkills();
+    this.validateAttributes();
+    
+    const areFieldsCorret = 
+      this.isNameChosen &&
+      this.areAttributePointsSpent &&
+      this.areSkillPointsSpent &&
+      this.areTradePointsSpent &&
+      this.areAncestryPointsSpent &&
+      this.areAncestriesChosen &&
+      this.areAncestryTraitOptionsPicked &&
+      this.isClassSelected &&
+      this.areClassOptionsSelected &&
+      this.areArmorPropertiesSelected &&
+      this.areArmorPropertyOptionsSelected &&
+      this.areShieldPropertiesSelected &&
+      this.areShieldPropertyOptionsSelected
+
+    if(areFieldsCorret){
       return true;
     }
     else {
-      this.navigateToSection(navigationPoint);
+      this.navigateToSection(this.navigationPoint);
       return false;
     }
-    //move to the error highest up the page <- to jako ostatnie tu zaimplementuj
+    
   }
-  /*
-  The following methods mark their related fields as right if the conditions
-  are met and they were previously marked as wrong
-  */
-  validateName(){
+  validateName() : boolean{
     if(this.character.name != ''){
       this.isNameChosen = true;
     }
+    else{
+      this.isNameChosen = false;
+      this.navigationPoint = 'finishSection';
+    }
+    return this.isNameChosen;
   }
-  validateAttributes(){
+  validateAttributes() : boolean{
     if(this.model.attributePoints == 0){
       this.areAttributePointsSpent = true;
     }
+    else{
+      this.areAttributePointsSpent = false
+      this.navigationPoint = 'attributesSection';
+    }
+    return this.areAttributePointsSpent;
   }
   validateSkills(){
     if(this.model.skillPoints == 0){
       this.areSkillPointsSpent = true;
     }
+    else{
+      this.areSkillPointsSpent = false;
+      this.navigationPoint = 'skillSection';
+    }
+    return this.areSkillPointsSpent;
   }
-  validateTrades(){
+  validateTrades() : boolean{
     if(this.model.tradePoints == 0){
       this.areTradePointsSpent = true;
     }
+    else{
+      this.areTradePointsSpent = false;
+      this.navigationPoint = 'tradesSection';
+    }
+    return this.areTradePointsSpent;
   }
-  validateAncestries(){
-    if(this.getAncestriesChosenNumber() < 3 || 
-      (this.model.allowLimitlessAncestries && this.getAncestriesChosenNumber() > 0)){
+  validateAncestries() : boolean{
+    if(this.model.ancestriesChosenNumber > 0 || 
+      (this.model.allowLimitlessAncestries && this.model.ancestriesChosenNumber > 0)){
         this.areAncestriesChosen = true;
       }
+    else{
+      this.areAncestriesChosen = false;
+      this.navigationPoint = 'ancestriesSection';
+    }
+      return this.areAncestriesChosen;
   }
-  validateAncestryTraits(){
+  validateAncestryTraits() : boolean{
     if(this.model.ancestryPoints == 0){
       this.areAncestryPointsSpent = true;
     }
+    else{
+      this.areAncestryPointsSpent = false;
+      this.navigationPoint = 'ancestriesSection';
+    }
+    return this.areAncestryPointsSpent;
   }
-  /*
-  Each trait that makes it so options need to be picked must be individually
-  checked for. This method may need to be expanded by for example ancestry traits
-  that allow to choose a spell or damage type for some effect
-  */
-  validateAncestryTraitOptions(){
-    let ancestriesSelected = this.model.ancestries.filter(a=>a.selected);
-    for(let a of ancestriesSelected){
-      for(let t of a.traits){
-        if(t.name == 'Attribute Increase' && t.selected && this.model.attributeForIncrease_name != ''){
-          this.model.isAttributeIncreaseCorrect = true;
-        }
-        if(t.name == 'Attribute Decrease' && t.selected && this.model.attributeForDecrease_name != ''){
-          this.model.isAttributeDecreaseCorrect = true
-        }
-        if(t.name == 'Skill Expertise' && t.selected && this.skillForExpertise_name != ''){
-          this.isSkillExpertiseCorrect = true;
-        }
-        if(t.name == 'Trade Expertise' && t.selected && this.tradeForExpertise_name != ''){
-          this.isTradeExpertiseCorrect = true;
+  validateAncestryTraitOptions(): boolean{
+    let selectedAncestriesWithTraits = this.model.ancestries.filter(a=>a.selected==true && 
+      a.traits.length>0);
+    if(selectedAncestriesWithTraits.length != 0){
+      for(let a of selectedAncestriesWithTraits){
+        for(let t of a.traits){
+          this.areAncestryTraitOptionsPicked = t.optionSelected != '';
+          if(!this.areAncestryTraitOptionsPicked){
+            this.navigationPoint='ancestriesSection';
+            this.areAncestryTraitOptionsPicked = false;
+            return false;
+          }
         }
       }
     }
-    if(this.model.isAttributeDecreaseCorrect && this.model.isAttributeIncreaseCorrect && this.isSkillExpertiseCorrect &&
-        this.isTradeExpertiseCorrect){
-      this.areAncestryTraitOptionsPicked = true;
-    }
+    this.areAncestryTraitOptionsPicked = true;
+    return true;
   }
-  validateClass(){
-    if(this.currentClass != undefined){
+  validateClass() : boolean{
+    if(this.model.currentClass != undefined){
       this.isClassSelected == true;
     }
+    else{
+      this.isClassSelected = false;
+      this.navigationPoint = 'classSection';
+    }
+    return this.isClassSelected;
   }
-  validateClassOptions(){
-    let talentsWithOptions = this.currentClass?.talents.filter(t=>
+  validateClassOptions() : boolean{
+    let talentsWithOptions = this.model.currentClass?.talents.filter(t=>
       t.numberOfOptionsToChoose>0);
     let isEnoughOptionsSelected : boolean = true;
     if(talentsWithOptions != undefined){
       for(let talent of talentsWithOptions){
         let numberOfChosen = talent.options.filter(o=>o.selected).length;
         if(numberOfChosen != talent.numberOfOptionsToChoose){
-          isEnoughOptionsSelected = false;
+          this.navigationPoint='classSection';
+          this.areClassOptionsSelected = false;
+          return false;
         }
       }
     }
-    if(isEnoughOptionsSelected){
-      this.areClassOptionsSelected = true;
+    this.areClassOptionsSelected = true;
+    return true
+  }
+  validateManeuvers() : boolean{
+    if(this.model.currentClass != undefined &&
+       this.model.currentClass.stamina>0 &&
+       this.model.maneuverPoints > 0){
+        this.areManeuversSelected = false;
+        return false;
     }
+    else return true;
+  }
+  validateCantrips() : boolean{
+    if(this.model.currentClass != undefined &&
+       this.model.currentClass.mana>0 &&
+       this.model.cantripPoints > 0){
+       this.areCantripsSelected = false;
+        return false;
+    }
+    else return true;
+  }
+  validateSpells() : boolean{
+    if(this.model.currentClass != undefined &&
+       this.model.currentClass.mana>0 &&
+       this.model.spellPoints > 0){
+       this.areSpellsSelected = false;
+        return false;
+    }
+    else return true;
+  }
+  validateArmorOptions() : boolean{
+    if(this.model.isWearingArmor && this.model.armorPoints != 0){
+      this.areArmorPropertiesSelected = false;
+    }
+    else{
+      this.areArmorPropertiesSelected = true;
+      this.navigationPoint = 'armorSection';
+    }
+    return this.areArmorPropertiesSelected;
+  }
+  validateArmorOptionSelections() : boolean{
+    let armorPropertiesSelected = this.model.armorProperties.filter(p=>p.options.some(o=>o.selected));
+    let armorPropertiesSelectedWithOptions = armorPropertiesSelected.filter(p=>p.selection!=null);
+    if(armorPropertiesSelectedWithOptions.length == 0){
+      this.areArmorPropertyOptionsSelected = true;
+      return true;
+    }
+    else{
+      for(let p of armorPropertiesSelectedWithOptions){
+        this.areArmorPropertyOptionsSelected = p.selection.selectionName != '';
+        if(!this.areArmorPropertyOptionsSelected){
+          this.navigationPoint='armorSection';
+          this.areArmorPropertyOptionsSelected = false;
+          return false;
+        }
+      }
+    }
+    this.areArmorPropertyOptionsSelected = true;
+    return true;
+  }
+  validateShieldOptions() : boolean{
+    if(this.model.isWearingShield && this.model.shieldPoints != 0){
+      this.areShieldPropertiesSelected = false;
+    }
+    else{
+      this.navigationPoint = 'armorSection';
+    }
+    return this.areShieldPropertiesSelected
+  }
+  validateShieldOptionSelections() : boolean{
+    let shieldPropertiesSelected = this.model.shieldProperties.filter(p=>p.options.some(o=>o.selected));
+    let shieldPropertiesSelectedWithOptions = shieldPropertiesSelected.filter(p=>p.selection!=null);
+    if(shieldPropertiesSelectedWithOptions.length == 0){
+      this.areShieldPropertyOptionsSelected = true;
+      return true;
+    }
+    else{
+      for(let p of shieldPropertiesSelectedWithOptions){
+        this.areShieldPropertyOptionsSelected = p.selection.selectionName != '';
+        if(!this.areShieldPropertyOptionsSelected){
+          this.navigationPoint='armorSection';
+          this.areShieldPropertyOptionsSelected = false;
+          return false;
+        }
+      }
+    }
+    this.areShieldPropertyOptionsSelected = true;
+    return true;
   }
 
   //Navigation
@@ -970,8 +777,9 @@ are not handled at all. The IAncestryTrait interface will need to be expanded to
     {display:'Trades',name:'tradesSection'},
     {display:'Ancestries',name:'ancestriesSection'},
     {display:'Classes',name:'classSection'},
+    {display:'Cantrips',name:'cantripsSection'},
     {display:'Spells',name:'spellsSection'},
-    {display:'Maneuvers',name:'maneuverSection'},
+    {display:'Maneuvers',name:'maneuversSection'},
     {display:'Armor',name:'armorSection'},
     {display:'Finish',name:'finishSection'},
   ]
@@ -985,25 +793,36 @@ are not handled at all. The IAncestryTrait interface will need to be expanded to
   closeSidenav(sidenav: any) {
     sidenav.close();
   }
-  
 
   ngOnInit(): void {
     this.character = this.characterCreated.character;
     this.http.get<any>('assets/ancestries.json').subscribe({
       next: (data) => {
-        //this.model.ancestries = data.ancestries;
+        this.model.ancestries = data.ancestries;
         console.log(this.model.ancestries);
       }
     });
     this.http.get<any>('assets/classes.json').subscribe(data => {
-      this.classes = data.classes;
-      console.log(this.classes);
+      this.model.classes = data.classes;
     });
-      this.http.get<any>('assets/armorProperties.json').subscribe(data => {
-      this.armorProperties = data.armorProperties;
+    this.http.get<any>('assets/armorProperties.json').subscribe(data => {
+      this.model.armorProperties = data.armorProperties;
     });
-      this.http.get<any>('assets/shieldProperties.json').subscribe(data => {
-      this.shieldProperties = data.shieldProperties;
+    this.http.get<any>('assets/shieldProperties.json').subscribe(data => {
+      this.model.shieldProperties = data.shieldProperties;
+    });
+    this.http.get<any>('assets/maneuvers.json').subscribe(data => {
+      this.model.maneuvers = data.maneuvers;
+    });
+    let spells : ISpell[] = [];
+    this.http.get<any>('assets/spells.json').subscribe({
+      next: (data) => {
+        spells = data.spells;
+      },
+      complete : () => {
+        this.model.cantrips = spells.filter(s=>s.costMP==0);
+        this.model.spells = spells.filter(s=>s.costMP>0);
+      }
     });
 
   }
@@ -1023,7 +842,7 @@ are not handled at all. The IAncestryTrait interface will need to be expanded to
     healthPoints: 0,
     precisionDefense: 4,
     areaDefense: 4,
-    characterClass: this.currentClass,
+    characterClass: this.model.currentClass,
     mana: 1,
     stamina: 1,
     ancestries: [],
@@ -1031,6 +850,6 @@ are not handled at all. The IAncestryTrait interface will need to be expanded to
     attributes: [],
     skills: [],
     trades: [],
-    features: this.features
+    features: []
   }; 
 }

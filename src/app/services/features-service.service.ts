@@ -1,0 +1,112 @@
+import { Injectable } from "@angular/core";
+import { IFeature } from "../interfaces/IFeature";
+import { IAncestryTrait } from "../interfaces/IAncestryTrait";
+import { IAncestry } from "../interfaces/IAncestry";
+import { IClass } from "../interfaces/IClass";
+import { ITalentOption } from "../interfaces/ITalentOption";
+import { IArmorProperty } from "../interfaces/IArmorProperty";
+
+@Injectable({
+  providedIn: 'root'
+})
+export class FeaturesService {
+
+  public makeFeaturesFromAncestry(a:IAncestry) : IFeature[]{
+    let features : IFeature[] = [];
+    let selectedTraits : IAncestryTrait[] = a.traits.filter(t=>t.selected);
+    let nameToSet : string = '';
+    for(let t of selectedTraits){
+      nameToSet = '';
+      if(t.optionSelected != ""){
+        nameToSet = t.name + ': ' + t.optionSelected;
+      }
+      features.push({
+        name: t.name,
+        source: a.name,
+        text: t.text,
+        costAP: t.costAP,
+        costMP : t.costMP,
+        costSP : t.costSP
+      })
+    }
+    return features;
+  }
+
+  //opcje też potrzebują pola na koszt, bo np klątwa hexbladea
+  public makeFeaturesFromClass(c:IClass) : IFeature[]{
+    let features : IFeature[] = [];
+    let selectedOptions : ITalentOption[] = [];
+    let sourceToSet : string = '';
+    for(let t of c.talents){
+      selectedOptions = t.options.filter(o=>o.selected);
+      sourceToSet = t.name + ', ' + c.name;
+      for(let s of t.subTalents){
+        features.push({
+          name: s.name,
+          source: sourceToSet,
+          text: s.text,
+          costAP: 0,
+          costSP: 0,
+          costMP: 0
+        });
+      }
+
+      for(let o of selectedOptions){
+        features.push({
+          name: o.name,
+          source: sourceToSet,
+          text: o.text,
+          costAP: 0,
+          costSP: 0,
+          costMP: 0
+        });
+      }
+    }
+    return features;
+  }
+  public makeFeaturesFromArmor(a : IArmorProperty[]) : IFeature[] {
+    let features : IFeature[] = [];
+    let nameToSet = '';
+    let sourceToSet = 'Armor';
+    for(let p of a){
+      if(!p.selection.selectionsEmpty){
+        nameToSet = p.name + ': ' + p.selection.selectionName;
+      }
+      else {
+        nameToSet = p.name;
+      }
+      features.push({
+        name: nameToSet,
+        source: sourceToSet,
+        text: p.helperText,
+        costAP: 0,
+        costMP: 0,
+        costSP: 0
+      })
+    }
+    return features;
+  }
+
+  public makeFeaturesFromShield(a : IArmorProperty[]) : IFeature[]{
+    let features : IFeature[] = [];
+    let nameToSet = '';
+    let sourceToSet = 'Shield';
+    for(let p of a){
+      if(!p.selection.selectionsEmpty){
+        nameToSet = p.name + ': ' + p.selection.selectionName;
+      }
+      else {
+        nameToSet = p.name;
+      }
+      features.push({
+        name: nameToSet,
+        source: sourceToSet,
+        text: p.helperText,
+        costAP: 0,
+        costMP: 0,
+        costSP: 0
+      })
+    }
+    return features;
+  }
+}

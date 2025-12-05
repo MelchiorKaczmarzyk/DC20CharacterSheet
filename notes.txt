@@ -371,6 +371,42 @@ Co trzeba zachować/przyrwócić?
 
 
 
-NA RAZIE OLEW NA:
-- źle działające przydzielanie skillpointów
+NEXT STEPS
+- ogarnij jak wybieranie attribute in/de-crease i skill/trade expertise oddziałowuje z
+tym, kiedy user potem coś zmieni i kiedy w ogóle powinno być wybieralne.
+    CHECKED
+
+- popraw layout tego, jak się wyświetlają te opcje talentów
+- popraw implementację tego talentu do rogue, żeby była zgodna z zasadami (jak Ci odpiszą)
+- obsłuż go w characterClassService
+WSZYSTKO wskazuje na to, że rasa i klasa powinna być wybierana w tej apce przed skillami i tradeami!
+To też bardziej chyba odpowiada temu, jak się tworzy postać irl (SURVEY!)
+    CHECKED
+
+- zaimplementuj dodawanie featurów z talentów roguea
+- przetestuj rozdawanie skilli w połączeniu z ancestry i roguem
+- dodaj działanie z modelem i serwicem do armora
+
+- dodaj logikę obsługującą wchodzenie użytkownika w interkacje z systemem armoru
+    dodaj możliwość wybrania elemental damage typu
+    ZAIMPLEMENTUJ ARMOR SERVICE
+    Przeprogramuj onArmorOptionClicked tak, żeby używała ignore default na początku 
+- posprzątaj create-sheet-component (zaktualizuj walidację)
+
+- dodaj manewry (1 najpierw czy 2)
+- zaimplementuj featureService (jak zrobić te featury? Z zaznaczonych cośków i wybranych opcji)
+- przetestuj nawigowanie tam i z powrotem
+
+(będziesz gdzieś tu musiał dodać obsługę logowania)
+
+- Zaimplementuj dodawanie featurów przy wyjściu z tworzenia postaci dalej
+- Rozwiń viewCharacterComponent tak, żeby korzystał z modelu i dodaj layouty do featurów, spelli i manewrów
+
+kiedy wracasz z oglądania do tworzenia TO MUSISZ WYCOFAĆ WSZYSTKIE ZMIANY NA SELECTACH Z DROPDOWNÓW
+
+
+- Posprzątaj metody odpowiadające za atrybuty, skille, trady i ancestry w komponencie, bo masz ten nowy
+    system teraz całkiem zrobiony już        
+    NIE - zrób do na koniec jednak, to całe sprzątanie
+
     

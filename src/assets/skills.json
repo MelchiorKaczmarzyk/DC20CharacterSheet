@@ -3,62 +3,74 @@
     {
       "name": "Awarness",
       "attribute": "Prime",
-      "level": 0
+      "level": 0,
+      "levelCap":1
     },
     {
       "name": "Athletics",
       "attribute": "Might",
-      "level": 0
+      "level": 0,
+      "levelCap":1
     },
     {
       "name": "Intimidation",
       "attribute": "Might",
-      "level": 0
+      "level": 0,
+      "levelCap":1
     },
     {
       "name": "Acrobatics",
       "attribute": "Agility",
-      "level": 0
+      "level": 0,
+      "levelCap":1
     },
     {
       "name": "Trickery",
       "attribute": "Agility",
-      "level": 0
+      "level": 0,
+      "levelCap":1
     },
     {
       "name": "Stealth",
       "attribute": "Agility",
-      "level": 0
+      "level": 0,
+      "levelCap":1
     },
     {
       "name": "Animal",
       "attribute": "Charisma",
-      "level": 0
+      "level": 0,
+      "levelCap":1
     },
     {
       "name": "Influence",
       "attribute": "Charisma",
-      "level": 0
+      "level": 0,
+      "levelCap":1
     },
     {
       "name": "Insight",
       "attribute": "Charisma",
-      "level": 0
+      "level": 0,
+      "levelCap":1
     },
     {
       "name": "Investigation",
       "attribute": "Intelligence",
-      "level": 0
+      "level": 0,
+      "levelCap":1
     },
     {
       "name": "Medicine",
       "attribute": "Intelligence",
-      "level": 0
+      "level": 0,
+      "levelCap":1
     },
     {
       "name": "Survival",
       "attribute": "Intelligence",
-      "level": 0
+      "level": 0,
+      "levelCap":1
     }
     ]
 }

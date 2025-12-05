@@ -12,7 +12,7 @@ import { ICharacter } from '../../interfaces/ICharacter';
 import { CharacterCreatedService } from '../../services/character-created.service';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatToolbarModule} from '@angular/material/toolbar';
-import { SwipeDirective } from '../../directives/swipe-directive';
+import { SwipeDirective } from '../../directives/swipe.directive';
 import {MatListModule} from '@angular/material/list';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';

@@ -1,0 +1,50 @@
+{
+    "spells":[
+        {
+            "selected":false,
+            "name":"Cloud",
+            "sources":["Primal"],
+            "schools":["Conjuration"],
+            "tags":["Water","Poison","Impaired","Slasing","Ailment"],
+            "costAP":2,
+            "costMP":0,
+            "range":5,
+            "duration":10,
+            "durationUnit":"Minutes",
+            "isSustained":true,
+            "description": "description placeholder",
+            "enhancements":[
+                {
+                    "name":"Range",
+                    "costAP":1,
+                    "costMP":0,
+                    "repeteable":false,
+                    "description":"The range of the spell increases by 5 spaces"
+                }
+            ]
+        },
+        {
+            "selected":false,
+            "name":"Cloud",
+            "sources":["Primal"],
+            "schools":["Conjuration"],
+            "tags":["Water","Poison","Impaired","Slasing","Ailment"],
+            "costAP":2,
+            "costMP":1,
+            "range":5,
+            "duration":10,
+            "durationUnit":"Minutes",
+            "isSustained":true,
+            "description": "description placeholder",
+            "enhancements":[
+                {
+                    "name":"Area",
+                    "costAP":0,
+                    "costMP":1,
+                    "repeteable":true,
+                    "description":"The diameter of the Spell increases by 1 space"
+                }
+            ]
+        }
+    ]
+}
