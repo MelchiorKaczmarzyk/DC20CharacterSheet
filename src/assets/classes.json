@@ -4,11 +4,11 @@
             "selected": false,
             "name": "Rogue",
             "armorTraining": "Light",
-            "mana": 6,
+            "mana": 0,
             "cantripsKnown": 0,
             "spellsKnown": 0,
             "stamina": 1,
-            "maneuversKnown": 4,
+            "maneuversKnown": 1,
             "hp": 9,
             "talents": [
                 {
@@ -52,7 +52,7 @@
                     "costSP": 0,
                     "costMP": 0,
                     "levelRequirement": 1,
-                    "numberOfOptionsToChoose":1,
+                    "numberOfOptionsToChoose":0,
                     "options": [],
                     "text": "You gain the following benefits:",
                     "subTalents": [

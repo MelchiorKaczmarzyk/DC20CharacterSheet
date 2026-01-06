@@ -12,38 +12,23 @@ export class AncestriesService {
 
   onTraitSelected(model: CreateSheetModel, ancestry: IAncestry, trait: IAncestryTrait) {
     model.ancestryPointsSpent += trait.cost;
-
-    //to powinien robić service
-    model.features.push({
-      name: trait.name,
-      source: ancestry.name,
-      text: trait.text,
-      costAP: trait.costAP,
-      costMP: trait.costMP,
-      costSP: trait.costSP
-    });
-
-    //SKILL EXPERTISE
-    if(trait.name == "Skill Expertise"){
-      if(model.isSkillAdept){
-        this.revertTrait(model, ancestry, trait);
-      }
-    }
-
-    //TRADE EXPERTISE
-    if(trait.name == "Trade Expertise"){
-      if(model.isTradeAdept){
-        this.revertTrait(model, ancestry, trait);
-      }
-    }
   }
 
   revertTrait(model: CreateSheetModel, ancestry: IAncestry, trait: IAncestryTrait) {
     model.ancestryPointsSpent -= trait.cost;
 
-    model.features = model.features.filter(f=>f.name!=trait.name);
-    //reverts the changes made to model by selecting a trait. It does that by making opposite changes 
-
+    if(trait.name == "Attribute Increase"){
+      this.revertOption(model,trait,this.previousAttributeIncreaseOption);
+    }
+    if(trait.name == "Attribute Decrease"){
+      this.revertOption(model,trait,this.previousAttributeDecreaseOption);
+    }
+    if(trait.name == "Skill Expertise"){
+      this.revertOption(model,trait,this.previousSkillExpertiseOption);
+    }
+    if(trait.name == "Trade Expertise"){
+      this.revertOption(model,trait,this.previousTradeExpertiseOption);
+    }
   }
 
   recalculateOptions(model: CreateSheetModel, trait: IAncestryTrait){
@@ -94,6 +79,7 @@ export class AncestriesService {
         attribute.floor += 1;
         attribute.value += 1;
       }
+      trait.optionSelected=option;
       this.previousAttributeIncreaseOption = option;
     }
     //SKILL EXPERTISE
@@ -103,6 +89,7 @@ export class AncestriesService {
         skill.level = 2;
         model.skillForExpertise = skill;
       }
+      trait.optionSelected=option;
       this.previousSkillExpertiseOption = option;
     }
     //ATTRIBUTE DECREASE
@@ -111,7 +98,11 @@ export class AncestriesService {
       if(attribute != undefined){
         attribute.ceiling -= 1;
         attribute.value -=- 1;
+        if(attribute.name=="Intelligence"){
+          model.resetSkillsAndTrades();
+        }
       }
+      trait.optionSelected=option;
       this.previousAttributeDecreaseOption = option;
     }
     //TRADE EXPERTISE
@@ -120,6 +111,7 @@ export class AncestriesService {
       if(trade != undefined){
         trade.level = 2;
       }
+      trait.optionSelected=option;
       this.previousTradeExpertiseOption = option;
     }
 
@@ -139,6 +131,9 @@ export class AncestriesService {
       if(attribute != undefined){
         attribute.floor -= 1;
         attribute.value -= 1;
+        if(attribute.name=="Intelligence"){
+          model.resetSkillsAndTrades();
+        }
       }
     }
     //SKILL EXPERTISE

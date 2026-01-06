@@ -399,8 +399,15 @@ To też bardziej chyba odpowiada temu, jak się tworzy postać irl (SURVEY!)
 
 (będziesz gdzieś tu musiał dodać obsługę logowania)
 
-- Zaimplementuj dodawanie featurów przy wyjściu z tworzenia postaci dalej
 - Rozwiń viewCharacterComponent tak, żeby korzystał z modelu i dodaj layouty do featurów, spelli i manewrów
+WYBÓR KLASY MUSI BYĆ PIERWSZY
+Ancestry, klasa, manewry i armor się resetują, bo onInit się odpala znowu
+
+
+- Możliwe, że będziesz musiał te radiobuttony wszystkie ogarnąć, bo jak klikniesz daleko to one się zaznaczają
+bez triggerowania logiki
+- Chyba nie mogę zrobić, żeby 0 cost był nieklikalny, więc może to będę musiał przerobić jak te inne checkboxy,
+albo dodać to do errorów po prostu, że nie mogą być 2 za 0.
 
 kiedy wracasz z oglądania do tworzenia TO MUSISZ WYCOFAĆ WSZYSTKIE ZMIANY NA SELECTACH Z DROPDOWNÓW
 

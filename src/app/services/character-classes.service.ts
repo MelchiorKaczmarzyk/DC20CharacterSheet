@@ -24,18 +24,11 @@ constructor(){}
         //ROGUE
         if(c.name == "Rogue"){
             //Roguish Finesse
+            model.resetSkillsAndTrades();
             model.skillPointsStart += 1;
             for(let s of model.skills){
                 if(s != model.skillForExpertise){
                     model.skillAdeptCost = 2;
-                    model.skillAdeptNumberMax = 12;
-                    if(s.level==1){
-                        model.skillPointSpent -= 1;
-                    }
-                    if(s.level==2){
-                        model.skillPointSpent -= 3;
-                    }
-                    s.level = 0;
                 }
             }
         }

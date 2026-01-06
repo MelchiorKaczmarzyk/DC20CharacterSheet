@@ -42,6 +42,8 @@ import { IManeuver } from '../../interfaces/IManeuver';
 import { ManeuverService } from '../../services/maneuver.service';
 import { SpellService } from '../../services/spell.service';
 import { ISpell } from '../../interfaces/ISpell';
+import { CharactersService } from '../../services/characters.service';
+import { FeaturesService } from '../../services/features-service.service';
 
 @Component({
   selector: 'app-create-sheet',
@@ -62,7 +64,8 @@ export class CreateSheetComponent implements OnInit, OnDestroy {
     private ancestryService: AncestriesService,
     private dataModel: CreateSheetModelService,
     private maneuverService: ManeuverService,
-    private spellService: SpellService){
+    private spellService: SpellService,
+    private featureService: FeaturesService){
     }
   model = this.dataModel.data;
   //ATRIBUTES
@@ -73,7 +76,7 @@ export class CreateSheetComponent implements OnInit, OnDestroy {
     }
   }
   decreaseAttribute(attribute: IAttribute){
-    if(attribute.value > attribute.floor && this.model.attributePoints < 13){
+    if(attribute.value > attribute.floor && this.model.attributePoints < 13 && this.model.attributePoints!=-1){
       attribute.value -= 1;
       if(attribute.name == "Intelligence"){
         this.model.skillPointSpent = 0;
@@ -157,7 +160,7 @@ export class CreateSheetComponent implements OnInit, OnDestroy {
 
   onNoviceTradeClicked(tradeName: string, event: MouseEvent){
     const trade: ITrade = this.getTrade(tradeName);
-    const enoughTradePoints = this.model.skillPoints > 0;
+    const enoughTradePoints = this.model.tradePoints > 0;
     const isLevel0 = trade.level == 0;
     const isLevel1 = trade.level == 1;
     const isLevel2 = trade.level == 2;
@@ -175,7 +178,7 @@ export class CreateSheetComponent implements OnInit, OnDestroy {
     else {
       event.preventDefault();
     }
-    this.areTradePointsSpent;
+    this.areTradePointsSpent = true;
   }
   onAdeptTradeClicked(tradeName: string, event: MouseEvent){
     event.preventDefault();
@@ -331,7 +334,7 @@ export class CreateSheetComponent implements OnInit, OnDestroy {
   }
   onCantripChosen(cantrip : ISpell, panel:any){
     //ensure the proper behaviour of the dropdown panel
-    if(cantrip.selected){
+    if(cantrip.selected && this.model.cantripPoints > 0){
       //for some reason the condition for closing appear to be backwards
       panel.close();
       this.spellService.onCantripSelected(this.model, cantrip);
@@ -345,7 +348,7 @@ export class CreateSheetComponent implements OnInit, OnDestroy {
   }
   onSpellChosen(spell : ISpell, panel:any){
     //ensure the proper behaviour of the dropdown panel
-    if(spell.selected){
+    if(spell.selected && this.model.spellPoints > 0){
       //for some reason the condition for closing appear to be backwards
       panel.close();
       this.spellService.onSpellSelected(this.model, spell);
@@ -432,7 +435,6 @@ export class CreateSheetComponent implements OnInit, OnDestroy {
     this.areArmorPropertiesSelected = true;
     this.areArmorPropertyOptionsSelected = true;
   }
-  isWearingShield : boolean = false
   onShieldDon(panel:any){
     this.areShieldPropertiesSelected = true;
     this.areShieldPropertyOptionsSelected = true;
@@ -511,10 +513,58 @@ export class CreateSheetComponent implements OnInit, OnDestroy {
     }
     this.areShieldPropertyOptionsSelected = true;
   }
+  createCharacter(){
+    let features : IFeature[] = [];
+    for(let a of this.model.ancestries){
+      features = features.concat(this.featureService.makeFeaturesFromAncestry(a));
+    }
+    if(this.model.currentClass != undefined){
+      features = features.concat(this.featureService.makeFeaturesFromClass(this.model.currentClass));
+    }
+    if(this.model.isWearingShield){
+      features = features.concat(this.featureService.makeFeaturesFromShield(this.model.shieldProperties));
+    }
+    if(this.model.isWearingArmor){
+      features = features.concat(this.featureService.makeFeaturesFromArmor(this.model.armorProperties));
+    }
+    let character :ICharacter = {
+      id: "",
+      name: this.model.characterName,
+      level: 1,
+      combatMastery: 1,
+      attack: 4,
+      dc: 14,
+      speed: this.model.speed,
+      healthPoints: this.model.hp,
+      precisionDefense: this.model.precisionDefense,
+      areaDefense: this.model.areaDefense,
+      characterClass: this.model.currentClass,
+      mana: this.model.currentClass?.mana ?? 0,
+      stamina: this.model.currentClass?.stamina ?? 0,
+      ancestries: this.model.ancestries.filter(a=>a.selected==true),
+      prime: 3,
+      attributes: this.model.attributes,
+      skills: this.model.skills,
+      trades: this.model.trades,
+      spells: this.model.spells,
+      maneuvers: this.model.maneuvers,
+      features: features
+    };
+    this.characterCreated.character = character;
+  }
 
   onFinishClicked() {
     if(this.validateFields()){
-      //TUTAJ ZRÓB FEATURY I PODODAWAJ JE DO OBECNEJ POSTACI
+      this.createCharacter();
+      console.log(this.characterCreated.character);
+      this.router.navigate(['/app/viewCharacter']);
+    }
+
+
+    //FOR TEST ONLY
+    else{
+      this.createCharacter();
+      console.log(this.characterCreated.character);
       this.router.navigate(['/app/viewCharacter']);
     }
   }
@@ -577,7 +627,7 @@ export class CreateSheetComponent implements OnInit, OnDestroy {
     
   }
   validateName() : boolean{
-    if(this.character.name != ''){
+    if(this.model.characterName != ''){
       this.isNameChosen = true;
     }
     else{
@@ -587,7 +637,7 @@ export class CreateSheetComponent implements OnInit, OnDestroy {
     return this.isNameChosen;
   }
   validateAttributes() : boolean{
-    if(this.model.attributePoints == 0){
+    if(this.model.attributePoints <= 0){
       this.areAttributePointsSpent = true;
     }
     else{
@@ -643,8 +693,9 @@ export class CreateSheetComponent implements OnInit, OnDestroy {
     if(selectedAncestriesWithTraits.length != 0){
       for(let a of selectedAncestriesWithTraits){
         for(let t of a.traits){
+          let hasOptions = t.options.length != 0;
           this.areAncestryTraitOptionsPicked = t.optionSelected != '';
-          if(!this.areAncestryTraitOptionsPicked){
+          if(hasOptions && !this.areAncestryTraitOptionsPicked){
             this.navigationPoint='ancestriesSection';
             this.areAncestryTraitOptionsPicked = false;
             return false;
@@ -721,7 +772,7 @@ export class CreateSheetComponent implements OnInit, OnDestroy {
   }
   validateArmorOptionSelections() : boolean{
     let armorPropertiesSelected = this.model.armorProperties.filter(p=>p.options.some(o=>o.selected));
-    let armorPropertiesSelectedWithOptions = armorPropertiesSelected.filter(p=>p.selection!=null);
+    let armorPropertiesSelectedWithOptions = armorPropertiesSelected.filter(p=>p.selection.selections.length>0);
     if(armorPropertiesSelectedWithOptions.length == 0){
       this.areArmorPropertyOptionsSelected = true;
       return true;
@@ -750,7 +801,7 @@ export class CreateSheetComponent implements OnInit, OnDestroy {
   }
   validateShieldOptionSelections() : boolean{
     let shieldPropertiesSelected = this.model.shieldProperties.filter(p=>p.options.some(o=>o.selected));
-    let shieldPropertiesSelectedWithOptions = shieldPropertiesSelected.filter(p=>p.selection!=null);
+    let shieldPropertiesSelectedWithOptions = shieldPropertiesSelected.filter(p=>p.selection.selections.length>0);
     if(shieldPropertiesSelectedWithOptions.length == 0){
       this.areShieldPropertyOptionsSelected = true;
       return true;
@@ -796,25 +847,41 @@ export class CreateSheetComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.character = this.characterCreated.character;
+    if(this.model.ancestries.length == 0){
     this.http.get<any>('assets/ancestries.json').subscribe({
       next: (data) => {
         this.model.ancestries = data.ancestries;
         console.log(this.model.ancestries);
       }
     });
+  }
+
+    if(this.model.classes.length == 0){
     this.http.get<any>('assets/classes.json').subscribe(data => {
       this.model.classes = data.classes;
     });
+  }
+
+    if(this.model.armorProperties.length == 0){
     this.http.get<any>('assets/armorProperties.json').subscribe(data => {
       this.model.armorProperties = data.armorProperties;
     });
+  }
+
+    if(this.model.shieldProperties.length == 0){
     this.http.get<any>('assets/shieldProperties.json').subscribe(data => {
       this.model.shieldProperties = data.shieldProperties;
     });
+  }
+
+    if(this.model.maneuvers.length == 0){
     this.http.get<any>('assets/maneuvers.json').subscribe(data => {
       this.model.maneuvers = data.maneuvers;
     });
+  }
+
     let spells : ISpell[] = [];
+    if(this.model.spells.length == 0 || this.model.cantrips.length == 0){
     this.http.get<any>('assets/spells.json').subscribe({
       next: (data) => {
         spells = data.spells;
@@ -824,6 +891,7 @@ export class CreateSheetComponent implements OnInit, OnDestroy {
         this.model.spells = spells.filter(s=>s.costMP>0);
       }
     });
+  }
 
   }
   ngOnDestroy(): void {
@@ -850,6 +918,8 @@ export class CreateSheetComponent implements OnInit, OnDestroy {
     attributes: [],
     skills: [],
     trades: [],
+    spells: [],
+    maneuvers: [],
     features: []
   }; 
 }

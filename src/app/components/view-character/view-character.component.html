@@ -96,9 +96,6 @@
     <input matInput [readonly]="true" value="67" style="font-size: 30px;" class="stats" name="sp"
         [(ngModel)]="character.stamina"/>
   </mat-form-field>
-
-  <!-- Stamina regen -->
-  <p class="centered-text">This is some information text.</p>
   </form>
 </div>
 <br>
@@ -120,7 +117,7 @@
             </mat-form-field>
         </div>
     <!--Skills-->
-    <div id="SkillsAndTrades"></div>
+    <div id="Skills&Trades"></div>
     <table mat-table [dataSource]="skillsTrained" class="mat-elevation-z8 my-table">
     <ng-container id="Skill" matColumnDef="Skill">
         <th mat-header-cell *matHeaderCellDef> Skill/Trade </th>

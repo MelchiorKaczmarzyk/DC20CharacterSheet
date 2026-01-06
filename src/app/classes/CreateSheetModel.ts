@@ -12,19 +12,24 @@ import { ISpell } from "../interfaces/ISpell";
 
 export class CreateSheetModel{
     constructor(){}
+
+    characterName = '';
+
     attributes: IAttribute[] = [
         { name: "Might", value: -2, floor: -2, ceiling: 3 },
         { name: "Agility", value: -2, floor: -2, ceiling: 3 },
         { name: "Charisma", value: -2, floor: -2, ceiling: 3 },
         { name: "Intelligence", value: -2, floor: -2, ceiling: 3 },
     ];
+    attributePointsBasic = 4;
     get attributePoints() : number{
         let mightScore = this.attributes.find(a=>a.name=="Might")?.value ?? 0;
         let agilityScore = this.attributes.find(a=>a.name=="Agility")?.value ?? 0;
         let charismaScore = this.attributes.find(a=>a.name=="Charisma")?.value ?? 0;
         let intelligenceScore = this.attributes.find(a=>a.name=="Intelligence")?.value ?? 0;
         let totalScore = mightScore + agilityScore + charismaScore + intelligenceScore;
-        return 4 - totalScore;
+        let attributePoints = this.attributePointsBasic - totalScore;
+        return attributePoints;
     }
 
     skills: ISkill[] = [
@@ -53,8 +58,18 @@ export class CreateSheetModel{
         return this.skills.filter(s=>s.level==2).length;
     }
     skillAdeptNumberMax = 1;
-
     skillForExpertise : ISkill | undefined;
+
+    resetSkillsAndTrades(){
+      this.skillPointSpent = 0;
+        this.tradePointsSpent = 0;
+        for(let skill of this.skills){
+          skill.level = 0;
+        }
+        for(let trade of this.trades){
+          trade.level = 0;
+        }
+    }
 
     trades: ITrade[] = [
         { name: "", level: 0 },
@@ -120,6 +135,7 @@ export class CreateSheetModel{
     }
     return false;
   }
+  speed = 5;
   /*
     isAttributeIncreaseCorrect : boolean = true;
     isAttributeDecreaseCorrect : boolean = true;

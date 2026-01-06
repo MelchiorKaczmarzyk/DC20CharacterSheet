@@ -7,16 +7,16 @@ import { ISpell } from "../interfaces/ISpell";
 })
 export class SpellService {
   constructor(){}
-  onCantripSelected(model : CreateSheetModel, maneuver : ISpell){
+  onCantripSelected(model : CreateSheetModel, spell : ISpell){
     model.cantripPointsSpent+=1;
   }
-  revertCantripSelection(model : CreateSheetModel, maneuver : ISpell){
+  revertCantripSelection(model : CreateSheetModel, spell : ISpell){
     model.cantripPointsSpent-=1;
   }
-  onSpellSelected(model : CreateSheetModel, maneuver : ISpell){
+  onSpellSelected(model : CreateSheetModel, spell : ISpell){
     model.spellPointsSpent+=1;
   }
-  revertSpellSelection(model : CreateSheetModel, maneuver : ISpell){
+  revertSpellSelection(model : CreateSheetModel, spell : ISpell){
     model.spellPointsSpent-=1;
   }
 }

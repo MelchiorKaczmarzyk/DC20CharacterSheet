@@ -52,6 +52,8 @@ export class CharacterCreatedService {
         {name: '', level: 0},
         {name: '', level: 0},
         {name: '', level: 0}],
+    spells: [],
+    maneuvers: [],
     features: [],
     speed: 5
   };

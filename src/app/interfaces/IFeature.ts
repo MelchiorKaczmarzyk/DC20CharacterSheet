@@ -1,5 +1,6 @@
 export interface IFeature{
     name: string; 
+    section: string,
     source: string;
     text: string;
     costAP: number,

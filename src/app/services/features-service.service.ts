@@ -22,6 +22,7 @@ export class FeaturesService {
       }
       features.push({
         name: t.name,
+        section: "Ancestry",
         source: a.name,
         text: t.text,
         costAP: t.costAP,
@@ -43,6 +44,7 @@ export class FeaturesService {
       for(let s of t.subTalents){
         features.push({
           name: s.name,
+          section: "Class",
           source: sourceToSet,
           text: s.text,
           costAP: 0,
@@ -54,6 +56,7 @@ export class FeaturesService {
       for(let o of selectedOptions){
         features.push({
           name: o.name,
+          section: "Class",
           source: sourceToSet,
           text: o.text,
           costAP: 0,
@@ -75,14 +78,17 @@ export class FeaturesService {
       else {
         nameToSet = p.name;
       }
-      features.push({
-        name: nameToSet,
-        source: sourceToSet,
-        text: p.helperText,
-        costAP: 0,
-        costMP: 0,
-        costSP: 0
-      })
+      if(p.options.some(o=>o.selected)){
+        features.push({
+          name: nameToSet,
+          section: "Armor",
+          source: sourceToSet,
+          text: p.helperText,
+          costAP: 0,
+          costMP: 0,
+          costSP: 0
+       })
+      }
     }
     return features;
   }
@@ -98,14 +104,17 @@ export class FeaturesService {
       else {
         nameToSet = p.name;
       }
-      features.push({
-        name: nameToSet,
-        source: sourceToSet,
-        text: p.helperText,
-        costAP: 0,
-        costMP: 0,
-        costSP: 0
-      })
+      if(p.options.some(o=>o.selected)){
+        features.push({
+          name: nameToSet,
+          section: "Shield",
+          source: sourceToSet,
+          text: p.helperText,
+          costAP: 0,
+          costMP: 0,
+          costSP: 0
+       })
+      }
     }
     return features;
   }

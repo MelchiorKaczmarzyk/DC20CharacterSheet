@@ -64,6 +64,8 @@ export class ViewCharacterComponent implements OnInit, OnDestroy {
     skills: [],
     trades: [],
     features: [],
+    spells:[],
+    maneuvers:[],
     speed: 0
   };
   statsTableDataSource : any[] = []
@@ -71,7 +73,7 @@ export class ViewCharacterComponent implements OnInit, OnDestroy {
   skillsColumnNames: string[] = ['Skill', 'Attribute', 'Total Modifier'];
   tradesColumnNames: string[] = ['Trade', 'Trade Modifier']
   sections: string[] = [
-    'Combat', 'Attributes', 'Skills&Trades','Actions', 'Maneuvers', 'Spells', 'Features', 'Class', 'Ancestry', 
+    'Combat', 'Attributes', 'Skills&Trades', 'Maneuvers', 'Spells', 'Class', 'Ancestry','Armor', 
     'Finish'
   ]
   getAttributeScoreForSkill(skill: ISkill) : number{

@@ -641,7 +641,7 @@
   <mat-accordion>
   <mat-expansion-panel #panel>
     <mat-expansion-panel-header>
-      <mat-checkbox [(ngModel)]="isWearingShield" (click)="onShieldDon(panel)">
+      <mat-checkbox [(ngModel)]="model.isWearingShield" (click)="onShieldDon(panel)">
       </mat-checkbox>
       <span class="class-name">Shield</span>
     </mat-expansion-panel-header>
@@ -720,7 +720,7 @@
       type="text"
       minlength="1"
       maxlength="15"
-      [(ngModel)]="character.name"
+      [(ngModel)]="model.characterName"
       (change)="validateName()"
     />
   </mat-form-field>
