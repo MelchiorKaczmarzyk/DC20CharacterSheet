@@ -411,6 +411,23 @@ albo dodać to do errorów po prostu, że nie mogą być 2 za 0.
 
 kiedy wracasz z oglądania do tworzenia TO MUSISZ WYCOFAĆ WSZYSTKIE ZMIANY NA SELECTACH Z DROPDOWNÓW
 
+WYWALIŁEM CANTRIPY, więc jak coś jest zdownione ze spellami, to pewnie dlatego
+NA RAZIE range i duration featurów jest 0, ale klas talenty i ancestry traity muszą mieć dodane duration i range
+- html do wyświetlania featurów
+- nawigacja po featurach
+
+- to samo jak klikniesz View pod postacią
+- logowanie
+- od razu nawigowanie do strony logowania jak po url spróbujesz wejść na inny komponent
+
+
+- Napraw wyświetlanie armor opcji
+- Zrób, żeby nie było BACK i DONE we View komponencie jak przechodzisz do niego z kolekcji postaci
+
+
+- Welcome -> login/register - (register) -> widok tworzenia usera -> loguje Cię od razu jak się zarejestujesz -> WYŚWIETL JAKOŚ
+GUARD żeby przekierowywać, jeżeli nie jest zalogowany
+
 
 - Posprzątaj metody odpowiadające za atrybuty, skille, trady i ancestry w komponencie, bo masz ten nowy
     system teraz całkiem zrobiony już        

@@ -6,5 +6,8 @@ export interface IManeuver {
     description : string;
     costAP : number;
     costSP : number;
+    duration: number;
+    range: number;
+    durationUnit: string;
     enhancements : IManeuverEnhancement[];
 }

@@ -21,8 +21,10 @@ import {FormsModule } from '@angular/forms';
 import {  Subscription } from 'rxjs';
 import { ISkill } from '../../interfaces/ISkill';
 import { ITrade } from '../../interfaces/ITrade';
-import {  Router } from '@angular/router';
+import {  ActivatedRoute, Router } from '@angular/router';
 import {MatSnackBar, MatSnackBarModule} from '@angular/material/snack-bar';
+import { IFeature } from '../../interfaces/IFeature';
+import { CharactersService } from '../../services/characters.service';
 
 @Component({
   selector: 'app-view-character',
@@ -35,8 +37,8 @@ import {MatSnackBar, MatSnackBarModule} from '@angular/material/snack-bar';
   styleUrl: './view-character.component.css'
 })
 export class ViewCharacterComponent implements OnInit, OnDestroy {
-  constructor(private characterCreated: CharacterCreatedService, private iconRegistry: MatIconRegistry,
-    private router: Router, private http: HttpClient
+  constructor(private characterCreated: CharacterCreatedService, private iconRegistry: MatIconRegistry, private charactersService: CharactersService,
+    private router: Router, private http: HttpClient, private route: ActivatedRoute
   ){
     iconRegistry.setDefaultFontSetClass('material-symbols-outlined');
   }
@@ -113,9 +115,14 @@ export class ViewCharacterComponent implements OnInit, OnDestroy {
     sidenav.close();
   }
 
-  onBackClicked()
+  toCreate()
   {
     this.router.navigate(['/app/create']);
+  }
+  
+  toCollection()
+  {
+    this.router.navigate(['/app/characterCollection']);
   }
 
   urlCharacter = 'https://dc20cs-default-rtdb.europe-west1.firebasedatabase.app/characters.json'
@@ -133,10 +140,56 @@ export class ViewCharacterComponent implements OnInit, OnDestroy {
     })
   }
 
+  classFeatures : IFeature[] = [];
+  filterClassFeatures(){
+    this.classFeatures = this.character.features.filter(f=>f.section=='Class');
+  }
+
+  ancestryFeatures : IFeature[] = [];
+  fitlerAncestryFeatures(){
+    this.ancestryFeatures = this.character.features.filter(f=>f.section=='Ancestry');
+  }
+
+  armorFeatures : IFeature[] = [];
+  filterArmorFeatures(){
+    this.armorFeatures = this.character.features.filter(f=>f.section=='Armor' || f.section=='Shield');
+    console.log(this.armorFeatures);
+  }
+
+  filterFeatures(){
+    this.filterClassFeatures();
+    this.fitlerAncestryFeatures();
+    this.filterArmorFeatures();
+  }
+  cameFromCharacterCollection : boolean = false;
+  characterId : string = ''
   ngOnInit(): void {
-    //this.icons.setDefaultFontSetClass();
-    console.log(this.characterCreated.character);
-    this.character = this.characterCreated.character;
+    this.characterId = this.route.snapshot.paramMap.get('id')!;
+    console.log(this.characterId);
+    if(this.characterId == null){
+      this.character = this.characterCreated.character;
+      this.cameFromCharacterCollection = false;
+    }
+    else{
+      this.cameFromCharacterCollection = true;
+
+      let retrievedCharacters : ICharacter[] = [];
+      this.charactersService.getCharacters().subscribe({
+        error: () => {
+            this.openSnackBar('Failed to load the character', 'Close',1500);
+          },
+          next: (data : any) => {
+            retrievedCharacters = data;
+          },
+          complete: () => {
+            let limbo = retrievedCharacters.find(c=>c.id==this.characterId);
+            if(limbo != undefined){
+              this.character = limbo;
+            }
+            this.filterFeatures();
+          }
+      });
+    }
     this.statsTableDataSource = [{
       attack: this.character?.attack,
       saveDc: this.character?.dc,

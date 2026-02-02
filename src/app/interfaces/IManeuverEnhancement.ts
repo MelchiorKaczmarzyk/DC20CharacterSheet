@@ -4,4 +4,5 @@ export interface IManeuverEnhancement{
     description: string;
     costAP : number;
     costSP : number;
+    repeteable: boolean;
 }

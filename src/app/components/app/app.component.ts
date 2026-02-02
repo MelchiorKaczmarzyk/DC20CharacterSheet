@@ -16,6 +16,9 @@ export class AppComponent implements OnInit {
   //To jest jakiś spaghetti code chyba
   ngOnInit(): void {
     let outletComponentName : String | null = this.route.snapshot.paramMap.get('appOutlet');
+    if (outletComponentName == null){
+      this.router.navigate(['/loginregister']);
+    }
     if (outletComponentName == 'welcome'){
       this.router.navigate(['/welcome']);
     }
@@ -25,7 +28,7 @@ export class AppComponent implements OnInit {
     if(outletComponentName == 'viewCharacter'){
       this.router.navigate(['/viewCharacter'])
     }
-    if(outletComponentName == null || outletComponentName == 'characterCollection'){
+    if(outletComponentName == 'characterCollection'){
       this.router.navigate(['/characterCollection'])
     }
   }

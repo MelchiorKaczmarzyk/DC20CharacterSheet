@@ -14,7 +14,6 @@ export class CreateSheetModelService {
         this.http.get<any>('assets/ancestries.json').subscribe({
         next: (data) => {
             this.data.ancestries = data.ancestries;
-            console.log(this.data.ancestries);
             },
         });
     }

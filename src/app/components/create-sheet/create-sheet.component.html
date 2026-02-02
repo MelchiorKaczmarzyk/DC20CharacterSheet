@@ -397,62 +397,6 @@
 </mat-accordion>
 </div>
 <!--Spells-->
-  <!--Cantrips-->
-<div class="page" id="cantripsSection" *ngIf="model.currentClass != undefined && model.currentClass.mana>0">
-<hr class="purple-border">
-<h2 class="section-header purple">Cantrips</h2>
-<hr class="purple-border">
-  <br>
-  <div class="form-container">
-  <form class="points-form">
-    <mat-form-field appearance="outline" class="remaining-field"
-    [ngClass]="{'error-look':!areCantripsSelected}">
-      <mat-label [ngClass]="{'error-look':!areCantripsSelected}">Available Cantrips</mat-label>
-      <input matInput type="number" [readonly]="true" 
-        name="remainingCantripPoints" class="section-header" [(ngModel)]="model.cantripPoints"/>
-    </mat-form-field>
-    </form>
-  </div>
-
-  <mat-accordion>
-  <mat-expansion-panel *ngFor="let cantrip of model.cantrips" #panel>
-
-    <mat-expansion-panel-header>
-      <div>
-      <mat-checkbox [(ngModel)]="cantrip.selected" (click)="onCantripChosen(cantrip, panel)">
-      </mat-checkbox>
-      </div>
-      <span class="class-name">{{ cantrip.name }}</span>
-    </mat-expansion-panel-header>
-    <p><strong>Source:</strong> {{ cantrip.sources.join(', ') }}</p>
-    <p><strong>School:</strong> {{ cantrip.schools.join(', ') }}</p>
-    <p><strong>Tags:</strong> {{ cantrip.tags.join(', ') }}</p>
-    <p><strong>Cost:</strong> {{cantrip.costAP}}AP</p>
-    <p><strong>Range:</strong> {{ cantrip.range }} spaces</p>
-    <p><strong>Duration:</strong> {{ cantrip.duration }} {{cantrip.durationUnit}} <ng-container *ngIf="cantrip.isSustained">(Sustained)</ng-container></p>
-    <p>{{cantrip.description}}</p>
-    <p><strong>Enhancements:</strong></p>
-    <div *ngFor="let enhancement of cantrip.enhancements" class="talent-section">
-        <p>
-          <strong class="talent-name" *ngIf="enhancement.costAP > 0 && enhancement.costMP > 0">
-            {{ enhancement.name }} ({{enhancement.costAP}}AP + {{enhancement.costMP}}MP
-            <ng-container *ngIf="enhancement.repeteable">, Repeatable</ng-container>):
-          </strong> 
-          <strong class="talent-name" *ngIf="enhancement.costAP > 0 && enhancement.costMP <= 0">
-            {{ enhancement.name }} ({{enhancement.costAP}}AP
-            <ng-container *ngIf="enhancement.repeteable">, Repeatable</ng-container>):
-          </strong> 
-          <strong class="talent-name" *ngIf="enhancement.costAP <= 0 && enhancement.costMP > 0">
-            {{ enhancement.name }} ({{enhancement.costMP}}MP
-            <ng-container *ngIf="enhancement.repeteable">, Repeatable</ng-container>):
-          </strong> 
-            {{ enhancement.description | prependSpace}}
-        </p>
-    </div>
-  </mat-expansion-panel>
-</mat-accordion>
-</div>
-  <!--Actual spells-->
 <div class="page" id="spellsSection" *ngIf="model.currentClass != undefined && model.currentClass.mana>0">
 <hr class="purple-border">
 <h2 class="section-header purple">Spells</h2>
@@ -474,7 +418,7 @@
 
     <mat-expansion-panel-header>
       <div>
-      <mat-checkbox [(ngModel)]="spell.selected" (click)="onCantripChosen(spell, panel)">
+      <mat-checkbox [(ngModel)]="spell.selected" (click)="onSpellChosen(spell, panel)">
       </mat-checkbox>
       </div>
       <span class="class-name">{{ spell.name }}</span>
@@ -487,7 +431,8 @@
     <p><strong>Duration:</strong> {{ spell.duration }} {{spell.durationUnit}} <ng-container *ngIf="spell.isSustained">(Sustained)</ng-container></p>
     <p>{{spell.description}}</p>
     <p><strong>Enhancements:</strong></p>
-    <div *ngFor="let enhancement of spell.enhancements" class="talent-section">
+    <ul>
+    <li *ngFor="let enhancement of spell.enhancements" class="talent-section">
         <p>
           <strong class="talent-name" *ngIf="enhancement.costAP > 0 && enhancement.costMP > 0">
             {{ enhancement.name }} ({{enhancement.costAP}}AP + {{enhancement.costMP}}MP:
@@ -503,7 +448,8 @@
           </strong> 
             {{ enhancement.description | prependSpace}}
         </p>
-    </div>
+      </li>
+    </ul>
   </mat-expansion-panel>
 </mat-accordion>
 </div>
@@ -533,11 +479,12 @@
       <mat-checkbox [(ngModel)]="maneuver.selected" (click)="onManeuverChosen(maneuver, panel)">
       </mat-checkbox>
       </div>
-      <span class="class-name">{{ maneuver.name }}</span>
+      <span class="class-name"><strong>{{ maneuver.name }}</strong></span>
     </mat-expansion-panel-header>
     <p>{{maneuver.description}}</p>
     <p><strong>Enhancements:</strong></p>
-    <div *ngFor="let enhancement of maneuver.enhancements" class="talent-section">
+    <ul>
+    <li *ngFor="let enhancement of maneuver.enhancements" class="talent-section">
         <p>
           <strong class="talent-name" *ngIf="enhancement.costAP > 0 && enhancement.costSP > 0">
             {{ enhancement.name }} ({{enhancement.costAP}}AP + {{enhancement.costSP}}SP):
@@ -550,7 +497,8 @@
           </strong> 
             {{ enhancement.description | prependSpace}}
         </p>
-    </div>
+    </li>
+    </ul>
   </mat-expansion-panel>
 </mat-accordion>
 </div>

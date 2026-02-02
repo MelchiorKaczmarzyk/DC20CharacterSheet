@@ -546,7 +546,7 @@ export class CreateSheetComponent implements OnInit, OnDestroy {
       attributes: this.model.attributes,
       skills: this.model.skills,
       trades: this.model.trades,
-      spells: this.model.spells,
+      spells: this.model.spells.filter(s=>s.selected),
       maneuvers: this.model.maneuvers,
       features: features
     };
@@ -848,47 +848,46 @@ export class CreateSheetComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.character = this.characterCreated.character;
     if(this.model.ancestries.length == 0){
-    this.http.get<any>('assets/ancestries.json').subscribe({
+    this.http.get<any>("https://dc20cs-default-rtdb.europe-west1.firebasedatabase.app/ancestries.json").subscribe({
       next: (data) => {
-        this.model.ancestries = data.ancestries;
-        console.log(this.model.ancestries);
+        console.log(data);
+        this.model.ancestries = data;
       }
     });
   }
 
     if(this.model.classes.length == 0){
-    this.http.get<any>('assets/classes.json').subscribe(data => {
-      this.model.classes = data.classes;
+    this.http.get<any>('https://dc20cs-default-rtdb.europe-west1.firebasedatabase.app/classes.json').subscribe(data => {
+      this.model.classes = data;
     });
   }
 
     if(this.model.armorProperties.length == 0){
-    this.http.get<any>('assets/armorProperties.json').subscribe(data => {
-      this.model.armorProperties = data.armorProperties;
+    this.http.get<any>('https://dc20cs-default-rtdb.europe-west1.firebasedatabase.app/armourProperties.json').subscribe(data => {
+      this.model.armorProperties = data;
     });
   }
 
     if(this.model.shieldProperties.length == 0){
-    this.http.get<any>('assets/shieldProperties.json').subscribe(data => {
-      this.model.shieldProperties = data.shieldProperties;
+    this.http.get<any>('https://dc20cs-default-rtdb.europe-west1.firebasedatabase.app/shieldProperties.json').subscribe(data => {
+      this.model.shieldProperties = data;
     });
   }
 
     if(this.model.maneuvers.length == 0){
-    this.http.get<any>('assets/maneuvers.json').subscribe(data => {
-      this.model.maneuvers = data.maneuvers;
+    this.http.get<any>('https://dc20cs-default-rtdb.europe-west1.firebasedatabase.app/maneuvers.json').subscribe(data => {
+      this.model.maneuvers = data;
     });
   }
 
     let spells : ISpell[] = [];
     if(this.model.spells.length == 0 || this.model.cantrips.length == 0){
-    this.http.get<any>('assets/spells.json').subscribe({
+    this.http.get<any>('https://dc20cs-default-rtdb.europe-west1.firebasedatabase.app/spells.json').subscribe({
       next: (data) => {
-        spells = data.spells;
+        spells = data;
       },
       complete : () => {
-        this.model.cantrips = spells.filter(s=>s.costMP==0);
-        this.model.spells = spells.filter(s=>s.costMP>0);
+        this.model.spells = spells
       }
     });
   }

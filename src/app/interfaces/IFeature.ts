@@ -6,4 +6,6 @@ export interface IFeature{
     costAP: number,
     costSP: number,
     costMP: number,
+    range: number,
+    duration: number,
 }

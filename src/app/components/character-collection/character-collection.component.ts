@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
 import {MatDialog, MatDialogModule} from '@angular/material/dialog';
 import { DeleteDialogComponent, DeleteDialogData } from './delete-dialog/delete-dialog.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-character-collection',
@@ -21,17 +22,13 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class CharacterCollectionComponent implements OnInit, OnDestroy {
   constructor(private charactersService: CharactersService, private iconRegistry: MatIconRegistry,
-    private router: Router, private http: HttpClient, private dialog: MatDialog)
+    private router: Router, private http: HttpClient, private dialog: MatDialog, private authService: AuthService)
   {
     iconRegistry.setDefaultFontSetClass('material-symbols-outlined');
   }
 
   subGetCharacters = new Subscription();
   characters : ICharacter[] = [];
-
-  viewCharacter(character: ICharacter){
-
-  }
 
   goToLvlUp(character : ICharacter){
 
@@ -68,6 +65,11 @@ export class CharacterCollectionComponent implements OnInit, OnDestroy {
     });
   }
 
+  viewCharacter(character: ICharacter){
+    console.log(character.id);
+    this.router.navigate(['/viewCharacter', character.id]);
+  }
+
   private _snackBar = inject(MatSnackBar);
   openSnackBar(message: string, action: string, duration: number) {
     this._snackBar.open(message, action, {duration:duration});
@@ -84,7 +86,15 @@ export class CharacterCollectionComponent implements OnInit, OnDestroy {
       },
       complete: () => {
         this.failedToGetCharacters = false;
+        console.log(this.characters);
       }
+    })
+    this.authService.user.subscribe(user => {
+      if (user) {
+      console.log('Logged in user:', user.uid, user.email);
+    } else {
+      console.log('Not logged in');
+    }
     })
   }
 

@@ -27,7 +27,9 @@ export class FeaturesService {
         text: t.text,
         costAP: t.costAP,
         costMP : t.costMP,
-        costSP : t.costSP
+        costSP : t.costSP,
+        range: 0,
+        duration: 0
       })
     }
     return features;
@@ -39,8 +41,9 @@ export class FeaturesService {
     let selectedOptions : ITalentOption[] = [];
     let sourceToSet : string = '';
     for(let t of c.talents){
-      selectedOptions = t.options.filter(o=>o.selected);
+      selectedOptions = (t.options==undefined)? [] : t.options.filter(o=>o.selected);
       sourceToSet = t.name + ', ' + c.name;
+      if(t.subTalents != undefined){
       for(let s of t.subTalents){
         features.push({
           name: s.name,
@@ -49,9 +52,12 @@ export class FeaturesService {
           text: s.text,
           costAP: 0,
           costSP: 0,
-          costMP: 0
+          costMP: 0,
+          range: 0,
+          duration: 0
         });
       }
+    }
 
       for(let o of selectedOptions){
         features.push({
@@ -61,7 +67,9 @@ export class FeaturesService {
           text: o.text,
           costAP: 0,
           costSP: 0,
-          costMP: 0
+          costMP: 0,
+          range: 0,
+          duration: 0
         });
       }
     }
@@ -86,7 +94,9 @@ export class FeaturesService {
           text: p.helperText,
           costAP: 0,
           costMP: 0,
-          costSP: 0
+          costSP: 0,
+          range: 0,
+          duration: 0
        })
       }
     }
@@ -107,12 +117,14 @@ export class FeaturesService {
       if(p.options.some(o=>o.selected)){
         features.push({
           name: nameToSet,
-          section: "Shield",
+          section: "Armor",
           source: sourceToSet,
           text: p.helperText,
           costAP: 0,
           costMP: 0,
-          costSP: 0
+          costSP: 0,
+          range: 0,
+          duration: 0
        })
       }
     }

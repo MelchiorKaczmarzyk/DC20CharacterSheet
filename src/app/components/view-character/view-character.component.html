@@ -150,18 +150,180 @@
     </table>
     </form>
 </div>
-    <!--ACTIONS-->
-    <div id="Actions">
+
+    <!--MANEUVERS-->
+    <div id="Maneuvers" *ngIf="character.maneuvers.length>0">
     <hr class="purple-border">
-    <h2 class="section-header purple">Actions</h2>
+    <h2 class="section-header purple">Maneuvers</h2>
     <hr class="purple-border">
     <div class="form-container">
-        <form classs="points-form">
+    <mat-accordion>
+    <mat-expansion-panel *ngFor="let maneuver of character.maneuvers" #panel>
 
-        </form>
+    <mat-expansion-panel-header>
+    <span class="class-name"><strong>{{ maneuver.name }}</strong></span>
+    </mat-expansion-panel-header>
+    <p><strong>Cost:</strong> {{maneuver.costAP}}AP, {{maneuver.costSP}}MP</p>
+    <p><strong>Range:</strong>
+      <ng-container *ngIf="maneuver.range!=0">{{ maneuver.range }} spaces</ng-container>
+      <ng-container *ngIf="maneuver.range==0">self</ng-container>
+      </p>
+    <p><strong>Duration:</strong> 
+      <ng-container *ngIf="maneuver.duration!=0">{{ maneuver.duration }} {{maneuver.durationUnit}}</ng-container>
+      <ng-container *ngIf="maneuver.duration==0">{{ maneuver.duration }} instantaneous</ng-container>
+      </p>
+    <p>{{maneuver.description}}</p>
+    <p><strong>Enhancements:</strong></p>
+    <ul>
+    <li *ngFor="let enhancement of maneuver.enhancements" class="talent-section">
+          <strong class="talent-name" *ngIf="enhancement.costAP > 0 && enhancement.costSP > 0">
+            {{ enhancement.name }} ({{enhancement.costAP}}AP + {{enhancement.costSP}SP:
+            <ng-container *ngIf="enhancement.repeteable">, Repeatable</ng-container>):
+          </strong> 
+          <strong class="talent-name" *ngIf="enhancement.costAP > 0 && enhancement.costSP <= 0">
+            {{ enhancement.name }} ({{enhancement.costAP}}AP
+            <ng-container *ngIf="enhancement.repeteable">, Repeatable</ng-container>):
+          </strong> 
+          <strong class="talent-name" *ngIf="enhancement.costAP <= 0 && enhancement.costSP > 0">
+            {{ enhancement.name }} ({{enhancement.costSP}}SP
+            <ng-container *ngIf="enhancement.repeteable">, Repeatable</ng-container>):
+          </strong> 
+            {{ enhancement.description}}
+      </li>
+    </ul>
+  </mat-expansion-panel>
+</mat-accordion>
+    </div>
     </div>
 
-    <div id="Finish">
+    <!--SPELLS-->
+    <div id="Spells" *ngIf="character.spells.length>0">
+    <hr class="purple-border">
+    <h2 class="section-header purple">Spells</h2>
+    <hr class="purple-border">
+    <div class="form-container">
+        <mat-accordion>
+    <mat-expansion-panel *ngFor="let spell of character.spells" #panel>
+
+    <mat-expansion-panel-header>
+    <span class="class-name"><strong>{{ spell.name }}</strong></span>
+    </mat-expansion-panel-header>
+    <p><strong>Source:</strong> {{ spell.sources.join(', ') }}</p>
+    <p><strong>School:</strong> {{ spell.schools.join(', ') }}</p>
+    <p><strong>Tags:</strong> {{ spell.tags.join(', ') }}</p>
+    <p><strong>Cost:</strong> {{spell.costAP}}AP, {{spell.costMP}}MP</p>
+    <p><strong>Range:</strong> {{ spell.range }} spaces
+      <ng-container *ngIf="spell.range!=0">{{ spell.range }} spaces</ng-container>
+      <ng-container *ngIf="spell.range==0">self</ng-container>
+      </p>
+    
+    <p><strong>Duration:</strong> 
+      <ng-container *ngIf="spell.duration!=0">{{ spell.duration }} {{spell.durationUnit}} <ng-container *ngIf="spell.isSustained">(Sustained)</ng-container></ng-container>
+      <ng-container *ngIf="spell.duration==0">instantaneous</ng-container>
+      </p>
+    <p>{{spell.description}}</p>
+    <p><strong>Enhancements:</strong></p>
+    <ul>
+    <li *ngFor="let enhancement of spell.enhancements" class="talent-section">
+          <strong class="talent-name" *ngIf="enhancement.costAP > 0 && enhancement.costMP > 0">
+            {{ enhancement.name }} ({{enhancement.costAP}}AP + {{enhancement.costMP}}MP:
+            <ng-container *ngIf="enhancement.repeteable">, Repeatable</ng-container>):
+          </strong> 
+          <strong class="talent-name" *ngIf="enhancement.costAP > 0 && enhancement.costMP <= 0">
+            {{ enhancement.name }} ({{enhancement.costAP}}AP
+            <ng-container *ngIf="enhancement.repeteable">, Repeatable</ng-container>):
+          </strong> 
+          <strong class="talent-name" *ngIf="enhancement.costAP <= 0 && enhancement.costMP > 0">
+            {{ enhancement.name }} ({{enhancement.costMP}}MP
+            <ng-container *ngIf="enhancement.repeteable">, Repeatable</ng-container>):
+          </strong> 
+            {{ enhancement.description}}
+      </li>
+    </ul>
+  </mat-expansion-panel>
+</mat-accordion>
+  </div>
+</div>
+
+    <!--CLASS TALENTS-->
+    <div id="Class">
+    <hr class="purple-border">
+    <h2 class="section-header purple">Class</h2>
+    <hr class="purple-border">
+    <div class="form-container">
+      <mat-accordion>
+        <mat-expansion-panel *ngFor="let feature of classFeatures" #panel>
+
+        <mat-expansion-panel-header>
+    <span class="class-name"><strong>{{ feature.name }}</strong></span>
+    </mat-expansion-panel-header>
+    <p *ngIf="feature.costAP>0"><strong>Cost:</strong> {{feature.costAP}}AP
+      <ng-container *ngIf="feature.costSP>0">, {{feature.costSP}}SP</ng-container>
+      <ng-container *ngIf="feature.costMP>0">, {{feature.costMP}}MP</ng-container>
+    </p>
+    <p *ngIf="feature.range>0"><strong>Range:</strong>
+      <ng-container *ngIf="feature.range!=0">{{ feature.range }} spaces</ng-container>
+      <ng-container *ngIf="feature.range==0">self</ng-container>
+      </p>
+    <p *ngIf="feature.duration>0"><strong>Duration:</strong> 
+      <ng-container *ngIf="feature.duration!=0">{{ feature.duration }} {{feature.duration}} spaces</ng-container>
+      <ng-container *ngIf="feature.duration==0">{{ feature.duration }} instantaneous</ng-container>
+      </p>
+    <p>{{feature.text}}</p>
+      </mat-expansion-panel>
+      </mat-accordion>
+    </div>
+    </div>
+
+    <!--ANCESTRY-->
+    <div id="Ancestry">
+    <hr class="purple-border">
+    <h2 class="section-header purple">Ancestry</h2>
+    <hr class="purple-border">
+    <div class="form-container">
+        <mat-accordion>
+        <mat-expansion-panel *ngFor="let feature of ancestryFeatures" #panel>
+
+        <mat-expansion-panel-header>
+    <span class="class-name"><strong>{{ feature.name }}</strong></span>
+    </mat-expansion-panel-header>
+    <p *ngIf="feature.costAP>0"><strong>Cost:</strong> {{feature.costAP}}AP
+      <ng-container *ngIf="feature.costSP>0">, {{feature.costSP}}SP</ng-container>
+      <ng-container *ngIf="feature.costMP>0">, {{feature.costMP}}MP</ng-container>
+    </p>
+    <p *ngIf="feature.range>0"><strong>Range:</strong>
+      <ng-container *ngIf="feature.range!=0">{{ feature.range }} spaces</ng-container>
+      <ng-container *ngIf="feature.range==0">self</ng-container>
+      </p>
+    <p *ngIf="feature.duration>0"><strong>Duration:</strong> 
+      <ng-container *ngIf="feature.duration!=0">{{ feature.duration }} {{feature.duration}} spaces</ng-container>
+      <ng-container *ngIf="feature.duration==0">{{ feature.duration }} instantaneous</ng-container>
+      </p>
+    <p>{{feature.text}}</p>
+      </mat-expansion-panel>
+      </mat-accordion>
+    </div>
+    </div>
+
+    <!--ARMOR-->
+    <div id="Armor">
+    <hr class="purple-border">
+    <h2 class="section-header purple">Armor</h2>
+    <hr class="purple-border">
+    <div class="form-container">
+        <mat-accordion>
+        <mat-expansion-panel *ngFor="let feature of armorFeatures" #panel>
+
+    <mat-expansion-panel-header>
+    <span class="class-name"><strong>{{ feature.name }}</strong></span>
+    </mat-expansion-panel-header>
+    <p>{{feature.text}}</p>
+      </mat-expansion-panel>
+      </mat-accordion>
+    </div>
+    </div>
+
+    <div id="Finish" *ngIf="cameFromCharacterCollection==false">
     <hr class="purple-border">
     <h2 class="section-header purple">FINISH</h2>
     <hr class="purple-border">
@@ -169,7 +331,7 @@
     <div class="form-container">
         <form class="points-form">
             <div class="input-row">
-        <button mat-raised-button color="primary" class="icon-button-left" (click)="onBackClicked()">
+        <button mat-raised-button color="primary" class="icon-button-left" (click)="toCreate()">
         <mat-icon  class="icon-left" >keyboard_arrow_left</mat-icon>
             <span class="margin-right">Back</span>
         </button>
@@ -180,9 +342,26 @@
             </div>
         </form>
     </div>
-     <br>
+    <br>
     </div>
-</div>
+
+    <div id="Finish" *ngIf="cameFromCharacterCollection==true">
+    <hr class="purple-border">
+    <h2 class="section-header purple">FINISH</h2>
+    <hr class="purple-border">
+    
+    <div class="form-container">
+        <form class="points-form">
+            <div class="input-row">
+        <button mat-raised-button color="primary" class="icon-button-left" (click)="toCollection()">
+            <span class="margin-right">Back</span>
+        </button>
+            </div>
+        </form>
+    </div>
+    <br>
+    </div>
+
 </mat-sidenav-content>
 </mat-sidenav-container>
 
