@@ -6,6 +6,7 @@ import { ICharacter } from '../interfaces/ICharacter';
 })
 export class CharacterCreatedService {
   public character : ICharacter = {
+    uid: "",
     id: "",
     name: "",
     characterClass: undefined,

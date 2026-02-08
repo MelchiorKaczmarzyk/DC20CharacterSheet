@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
 import {MatDialog, MatDialogModule} from '@angular/material/dialog';
 import { DeleteDialogComponent, DeleteDialogData } from './delete-dialog/delete-dialog.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { signOut } from 'firebase/auth';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -75,11 +76,36 @@ export class CharacterCollectionComponent implements OnInit, OnDestroy {
     this._snackBar.open(message, action, {duration:duration});
   }
 
+  logout() {
+    this.authService.logout()
+      .then(() => {
+        this.router.navigate(['/loginregister']);
+      })
+      .catch(err => console.error(err));
+  }
+
   failedToGetCharacters : boolean = false;
+  userName: string = '';
   ngOnInit(): void {
+    let currentUser: any
+    this.authService.user.subscribe(user => {
+      if (user) {
+        console.log('Logged in user:', user.uid, user.email);
+        currentUser = user;
+        this.userName = currentUser.email?.split('@')[0] ?? "";
+
+    } else {
+      console.log('Not logged in');
+    }
+    })
     this.subGetCharacters = this.charactersService.getCharacters().subscribe({
       next: characters => {
-        this.characters = characters;
+        if(currentUser.uid = 'rzfvl5RKMPUBM7vbXIhdWOnK1BJ2'){
+          this.characters = characters;
+        }
+        else {
+          this.characters = characters.filter(c=>c.uid==currentUser.uid);
+        }
       },
       error: () => {
         this.failedToGetCharacters = true;
@@ -88,13 +114,6 @@ export class CharacterCollectionComponent implements OnInit, OnDestroy {
         this.failedToGetCharacters = false;
         console.log(this.characters);
       }
-    })
-    this.authService.user.subscribe(user => {
-      if (user) {
-      console.log('Logged in user:', user.uid, user.email);
-    } else {
-      console.log('Not logged in');
-    }
     })
   }
 

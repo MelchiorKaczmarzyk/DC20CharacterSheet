@@ -528,6 +528,7 @@ export class CreateSheetComponent implements OnInit, OnDestroy {
       features = features.concat(this.featureService.makeFeaturesFromArmor(this.model.armorProperties));
     }
     let character :ICharacter = {
+      uid: "",
       id: "",
       name: this.model.characterName,
       level: 1,
@@ -899,6 +900,7 @@ export class CreateSheetComponent implements OnInit, OnDestroy {
 
 
   character: ICharacter = {
+    uid: "",
     id: "",
     name: "",
     level: 1,

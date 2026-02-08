@@ -5,14 +5,47 @@
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Email</mat-label>
           <input matInput type="email" formControlName="email" />
-          <mat-error *ngIf="form.get('email')?.hasError('invalidEmail')">
-          {{errorMessage}}  
+          <mat-error *ngIf="form.get('email')?.hasError('required')">
+            Email is required
           </mat-error>
+
+          <mat-error *ngIf="form.get('email')?.hasError('invalidEmail')">
+            Email address is not valid
+          </mat-error>
+
+         <mat-error *ngIf="form.get('email')?.hasError('userNotFound')">
+            No account found with this email
+          </mat-error>
+
+        <mat-error *ngIf="form.get('email')?.hasError('userDisabled')">
+          This account has been disabled
+        </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Password</mat-label>
           <input matInput type="password" formControlName="password" />
+        
+
+        <mat-error *ngIf="form.get('password')?.hasError('required')">
+          Password is required
+        </mat-error>
+
+        <mat-error *ngIf="form.get('password')?.hasError('wrongPassword') && !form.get('email')?.invalid">
+          Incorrect password
+       </mat-error>
+
+        <mat-error *ngIf="form.get('password')?.hasError('invalidCredential')">
+          Email or password is incorrect
+        </mat-error>
+
+        <mat-error *ngIf="form.get('password')?.hasError('tooManyRequests')">
+          Too many failed attempts. Try again later
+        </mat-error>
+
+        <mat-error *ngIf="form.get('password')?.hasError('loginFailed')">
+          Login failed. Please try again
+        </mat-error>
         </mat-form-field>
 
         <div class="button-row">

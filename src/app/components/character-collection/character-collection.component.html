@@ -1,4 +1,8 @@
 <div class="character-grid">
+  <span *ngIf="!(characters == [] && !failedToGetCharacters)">
+    <h1>Welcome {{userName}}!</h1>
+    <h2>Your characters:</h2>
+  </span>
   <span class="top-span" *ngIf="characters == [] && !failedToGetCharacters">
     No character havs been created yet
   </span>
@@ -33,4 +37,9 @@
       </div>
     </mat-card-content>
   </mat-card>
+
+    <!-- LOG OUT BUTTON -->
+     <button mat-stroked-button color="warn" (click)="logout()">
+            Logout
+    </button>
 </div>

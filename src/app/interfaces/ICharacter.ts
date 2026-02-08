@@ -8,6 +8,7 @@ import { ISpell } from "./ISpell";
 import { ITrade } from "./ITrade";
 
 export interface ICharacter {
+    uid: string;
     id: string;
     name: string;
     level: number;

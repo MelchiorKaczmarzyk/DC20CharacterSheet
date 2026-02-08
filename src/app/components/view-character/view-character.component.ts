@@ -25,6 +25,7 @@ import {  ActivatedRoute, Router } from '@angular/router';
 import {MatSnackBar, MatSnackBarModule} from '@angular/material/snack-bar';
 import { IFeature } from '../../interfaces/IFeature';
 import { CharactersService } from '../../services/characters.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-view-character',
@@ -38,7 +39,7 @@ import { CharactersService } from '../../services/characters.service';
 })
 export class ViewCharacterComponent implements OnInit, OnDestroy {
   constructor(private characterCreated: CharacterCreatedService, private iconRegistry: MatIconRegistry, private charactersService: CharactersService,
-    private router: Router, private http: HttpClient, private route: ActivatedRoute
+    private router: Router, private http: HttpClient, private route: ActivatedRoute, private authService: AuthService
   ){
     iconRegistry.setDefaultFontSetClass('material-symbols-outlined');
   }
@@ -48,6 +49,7 @@ export class ViewCharacterComponent implements OnInit, OnDestroy {
   }
 
   character : ICharacter = {
+    uid:"",
     id: "",
     name: "",
     characterClass: undefined,
@@ -163,6 +165,7 @@ export class ViewCharacterComponent implements OnInit, OnDestroy {
   }
   cameFromCharacterCollection : boolean = false;
   characterId : string = ''
+  characterUid: string = ''
   ngOnInit(): void {
     this.characterId = this.route.snapshot.paramMap.get('id')!;
     console.log(this.characterId);
@@ -196,6 +199,15 @@ export class ViewCharacterComponent implements OnInit, OnDestroy {
       combatMastery: this.character?.combatMastery,
       speed: this.character?.speed
     }]
+    this.authService.user.subscribe(user => {
+      if (user) {
+        this.character.uid = user.uid;
+        console.log(this.character.uid);
+
+    } else {
+      console.log('Not logged in');
+    }
+    })
   }
 
   ngOnDestroy(): void {

@@ -37,6 +37,9 @@ export class LoginRegisterComponent {
    
   errorMessage : string = '';
 
+  errorMessagePassword: string = ''
+  errorMessageEmail: string = ''
+
 
   initForm(){
     this.form = new FormGroup({
@@ -52,33 +55,68 @@ export class LoginRegisterComponent {
   onSubmit(){
 
   }
+  checkErrors(error: any){
+    console.error('error', error);
+          console.error('Firebase Auth Error:', error);
+
+          switch (error.code) {
+
+    /* =======================
+       EMAIL ERRORS
+    ======================== */
+
+    case 'auth/invalid-email':
+      this.errorMessageEmail = 'Email address is not valid.';
+      this.form.get('email')?.setErrors({ invalidEmail: true });
+      break;
+
+    case 'auth/user-not-found':
+      this.errorMessageEmail = 'No account found with this email.';
+      this.form.get('email')?.setErrors({ userNotFound: true });
+      break;
+
+    case 'auth/user-disabled':
+      this.errorMessageEmail = 'This account has been disabled.';
+      this.form.get('email')?.setErrors({ userDisabled: true });
+      break;
+
+    /* =======================
+       PASSWORD ERRORS
+    ======================== */
+
+    case 'auth/wrong-password':
+    case 'auth/invalid-credential': // 👈 KEY FIX
+      this.form.get('password')?.setErrors({ wrongPassword: true });
+      break;
+
+    case 'auth/too-many-requests':
+      this.form.get('password')?.setErrors({ tooManyRequests: true });
+      break;
+
+    /* =======================
+       FALLBACK
+    ======================== */
+
+    default:
+      this.form.get('password')?.setErrors({ loginFailed: true });
+  }
+
+      // Ensure errors appear
+      this.form.get('email')?.markAsTouched();
+      this.form.get('password')?.markAsTouched();
+  }
 
   onLogin(){
     if(!this.form.invalid){
+
       signInWithEmailAndPassword(this.auth, this.form.value.email, this.form.value.password).
         then((responese) => {
             this.router.navigate(['/app/characterCollection']);
         })
         .catch((error) => {
-          console.error('error', error);
-          if(error instanceof Error){
-            if(error.message.includes('auth/invalid-email')){
-              this.errorMessage = "Email is not valid"
-              this.form.get('email')?.setErrors({ invalidEmail: true });
-              this.form.get('email')?.markAsTouched();
-            }
-            //check firebase error codes and add handling
-            else if(false)
-            {
-
-            }
-          }
-        })
+          this.checkErrors(error);
+      });
     }
-    else{
-
-    }
-
   }
   onRegister(){
     if(!this.form.invalid){
@@ -87,19 +125,7 @@ export class LoginRegisterComponent {
           this.onLogin();
         })
         .catch((error) => {
-          console.error('error', error);
-          if(error instanceof Error){
-            if(error.message.includes('auth/invalid-email')){
-              this.errorMessage = "Email is not valid"
-              this.form.get('email')?.setErrors({ invalidEmail: true });
-              this.form.get('email')?.markAsTouched();
-            }
-            //check firebase error codes and add handling
-            else if(false)
-            {
-
-            }
-          }
+          this.checkErrors(error);
         })
     }
     else{
