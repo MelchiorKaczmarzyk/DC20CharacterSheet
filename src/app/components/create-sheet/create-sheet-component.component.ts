@@ -560,14 +560,6 @@ export class CreateSheetComponent implements OnInit, OnDestroy {
       console.log(this.characterCreated.character);
       this.router.navigate(['/app/viewCharacter']);
     }
-
-
-    //FOR TEST ONLY
-    else{
-      this.createCharacter();
-      console.log(this.characterCreated.character);
-      this.router.navigate(['/app/viewCharacter']);
-    }
   }
 
   isNameChosen : boolean = true;

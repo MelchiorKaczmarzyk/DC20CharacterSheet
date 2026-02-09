@@ -57,11 +57,11 @@ export class ViewCharacterComponent implements OnInit, OnDestroy {
     mana: 0,
     stamina: 0,
     level: 0,
-    combatMastery: 0,
+    combatMastery: 1,
     precisionDefense: 0,
     areaDefense: 0,
-    attack: 0,
-    dc: 0,
+    attack: 4,
+    dc: 14,
     prime: 3,
     attributes: [],
     ancestries: [],
@@ -70,7 +70,7 @@ export class ViewCharacterComponent implements OnInit, OnDestroy {
     features: [],
     spells:[],
     maneuvers:[],
-    speed: 0
+    speed: 5
   };
   statsTableDataSource : any[] = []
   combatStatsColumnNames: string[] = ['Attack', 'Save DC', 'Combat Mastery', 'Speed '];
