@@ -821,7 +821,6 @@ export class CreateSheetComponent implements OnInit, OnDestroy {
     {display:'Trades',name:'tradesSection'},
     {display:'Ancestries',name:'ancestriesSection'},
     {display:'Classes',name:'classSection'},
-    {display:'Cantrips',name:'cantripsSection'},
     {display:'Spells',name:'spellsSection'},
     {display:'Maneuvers',name:'maneuversSection'},
     {display:'Armor',name:'armorSection'},
