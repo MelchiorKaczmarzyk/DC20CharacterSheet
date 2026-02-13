@@ -1,0 +1,32 @@
+name: Angular Build CI
+
+# This action runs every time you push or make a pull request to the main/master branch
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Checks out your repository code so the action can access it
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # 2. Sets up the Node.js environment
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x' # Using a standard LTS Node version
+        cache: 'npm'
+
+    # 3. Installs all your Angular and Firebase dependencies
+    - name: Install dependencies
+      run: npm ci
+
+    # 4. Builds the Angular application
+    - name: Build the app
+      run: npm run build
